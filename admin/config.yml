@@ -4,8 +4,10 @@ backend:
 media_folder: "static/uploads"
 collections:
   - name: "pages"
+    label: "Pages"
     files:
       - name: "home"
+        label: "Home Page"
         file: "index.html"
         fields:
           - {label: "Title", name: "title", widget: "string"}

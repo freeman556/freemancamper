@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREE MAN - Pickup Camping Equipment</title>
+    <script>
+        // 从后台设置读取页面标题
+        try {
+            const savedData = localStorage.getItem('freeman_data');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.config && data.config.pageTitle) {
+                    document.title = data.config.pageTitle;
+                }
+            }
+        } catch(e) {}
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1a1a1a;
+            background: #fff;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .navbar {
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eee;
+        }
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1a1a;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: #1a1a1a;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+            border: none;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 36px;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #1a1a1a;
+            font-size: 15px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #b3541e;
+        }
+        .hero {
+            position: relative;
+            height: 70vh;
+            min-height: 600px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.75;
+            filter: brightness(0.7);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            color: #fff;
+            text-align: left;
+            width: 100%;
+        }
+        .hero-subtitle {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+        .hero h1 .highlight {
+            color: #b3541e;
+        }
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 36px;
+            max-width: 600px;
+            opacity: 0.9;
+            line-height: 1.7;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 16px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary {
+            background: #fff;
+            color: #1a1a1a;
+        }
+        .btn-primary:hover {
+            background: #f5f5f5;
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border-color: #fff;
+        }
+        .btn-outline:hover {
+            background: #fff;
+            color: #1a1a1a;
+        }
+        .categories {
+            background: #fff;
+            padding: 100px 0;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 72px;
+        }
+        .section-header h2 {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+        .section-header p {
+            font-size: 17px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+        }
+        .category-card {
+            text-align: center;
+            padding: 36px 20px;
+            background: #fafafa;
+            border-radius: 0;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border: 1px solid #eee;
+        }
+        .category-card:hover {
+            background: #fff;
+            border-color: #b3541e;
+            transform: translateY(-2px);
+        }
+        .category-icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+        .category-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .featured {
+            padding: 100px 0;
+            background: #fafafa;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 0;
+            overflow: hidden;
+            border: 1px solid #eee;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+            border-color: #ddd;
+        }
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+        .product-info {
+            padding: 28px 24px;
+        }
+        .product-category {
+            font-size: 12px;
+            color: #b3541e;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .product-name {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+        .product-desc {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-price {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+        .product-link {
+            color: #b3541e;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .view-more {
+            text-align: center;
+            margin-top: 48px;
+        }
+        .view-more a {
+            color: #b3541e;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer {
+            background: #0a0a0a;
+            color: #888;
+            padding: 80px 0 40px;
+        }
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 60px;
+        }
+        .footer-brand h3 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .footer-column h4 {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column li {
+            margin-bottom: 14px;
+        }
+        .footer-column a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .footer-column a:hover {
+            color: #b3541e;
+        }
+        .footer-bottom {
+            border-top: 1px solid #222;
+            padding-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+        /* 特色区块 - 配置器 & 案例 */
+        .feature-sections {
+            padding: 100px 0;
+            background: #fff;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        .feature-card {
+            position: relative;
+            height: 400px;
+            border-radius: 0;
+            overflow: hidden;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            align-items: flex-end;
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);
+            z-index: 1;
+        }
+        .feature-card-configurator {
+            background: #1a1a1a url('https://aka.doubaocdn.com/s/kLsM1wgX1c') center/cover;
+        }
+        .feature-card-cases {
+            background: #1a1a1a url('https://aka.doubaocdn.com/s/xDQy1wodQS') center/cover;
+        }
+        .feature-card-content {
+            position: relative;
+            z-index: 2;
+            padding: 48px;
+            width: 100%;
+        }
+        .feature-card-label {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #b3541e;
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        .feature-card-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .feature-card-desc {
+            font-size: 16px;
+            line-height: 1.7;
+            opacity: 0.9;
+            margin-bottom: 28px;
+            max-width: 400px;
+        }
+        .feature-card-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: #fff;
+            color: #1a1a1a;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .feature-card:hover .feature-card-btn {
+            background: #b3541e;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            .feature-card {
+                height: 320px;
+            }
+            .feature-card-content {
+                padding: 32px;
+            }
+            .feature-card-title {
+                font-size: 28px;
+            }
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            .nav-menu {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">FM</div>
+                <span>FREE MAN</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active" data-i18n="nav.home">首页</a></li>
+                <li><a href="products.html" data-i18n="nav.products">产品</a></li>
+                <li><a href="configurator.html" data-i18n="nav.configurator">配置器</a></li>
+                <li><a href="cases.html" data-i18n="nav.cases">案例</a></li>
+                <li><a href="faq.html" data-i18n="nav.faq">FAQ</a></li>
+                <li><a href="inquiry.html" data-i18n="nav.inquiry">询价</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <img src="https://aka.doubaocdn.com/s/xDQy1wodQS" alt="Hero" class="hero-bg" id="heroBg">
+        <div class="hero-content">
+            <h1 id="heroTitle" data-i18n="home.heroTitle">探索自然 <span class="highlight">自由前行</span></h1>
+            <p id="heroSubtitle" data-i18n="home.heroSubtitle">专注户外皮卡露营装备研发与制造，为每一位冒险者提供可靠的移动家园。</p>
+            <p data-i18n="home.heroSubtitle2">从皮卡背驼到拖挂房车，FREE MAN 陪伴你走遍山川湖海。</p>
+            <div class="hero-buttons">
+                <a href="products.html" class="btn btn-primary" data-i18n="home.browseProducts">浏览产品</a>
+                <a href="inquiry.html" class="btn btn-outline" data-i18n="home.onlineInquiry">在线询价</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="home.categoriesTitle">产品分类</h2>
+                <p data-i18n="home.categoriesSubtitle">六大产品系列，覆盖从轻量化车顶帐篷到全尺寸拖挂房车的完整户外露营解决方案</p>
+            </div>
+            <div class="category-grid" id="categoryGrid">
+                <!-- 分类将通过JavaScript动态渲染 -->
+            </div>
+        </div>
+    </section>
+
+    <section class="featured">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="home.featuredProducts">精选产品</h2>
+                <p data-i18n="home.featuredSubtitle">热销爆款，品质之选</p>
+            </div>
+            <div class="products-grid" id="featuredProductsGrid">
+                <!-- 精选产品将通过JavaScript动态渲染 -->
+            </div>
+            <div class="view-more">
+                <a href="products.html" data-i18n="home.viewMore">查看更多 →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="feature-sections">
+        <div class="container">
+            <div class="feature-grid">
+                <a href="configurator.html" class="feature-card feature-card-configurator">
+                    <div class="feature-card-content">
+                        <span class="feature-card-label" data-i18n="home.configuratorLabel">在线定制</span>
+                        <h3 class="feature-card-title" data-i18n="home.configuratorTitle">智能配置器</h3>
+                        <p class="feature-card-desc" data-i18n="home.configuratorDesc">自由搭配，打造专属于你的露营装备。实时预览，所见即所得。</p>
+                        <span class="feature-card-btn" data-i18n="home.startConfig">开始配置 →</span>
+                    </div>
+                </a>
+                <a href="cases.html" class="feature-card feature-card-cases">
+                    <div class="feature-card-content">
+                        <span class="feature-card-label" data-i18n="home.casesLabel">真实分享</span>
+                        <h3 class="feature-card-title" data-i18n="home.casesTitle">客户案例</h3>
+                        <p class="feature-card-desc" data-i18n="home.casesDesc">看看其他玩家的精彩旅程，获取灵感，开启你的户外冒险。</p>
+                        <span class="feature-card-btn" data-i18n="home.viewCases">浏览案例 →</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>
+                    <div class="logo-icon" style="width: 32px; height: 32px; font-size: 12px;">FM</div>
+                    FREE MAN
+                </h3>
+                <p data-i18n="footer.brandDesc">专注户外皮卡露营装备研发与制造，为每一位冒险者提供可靠的移动家园。</p>
+            </div>
+            <div class="footer-column">
+                <h4 data-i18n="footer.quickLinks">快速链接</h4>
+                <ul>
+                    <li><a href="index.html" data-i18n="nav.home">首页</a></li>
+                    <li><a href="products.html" data-i18n="nav.products">产品</a></li>
+                    <li><a href="configurator.html" data-i18n="nav.configurator">配置器</a></li>
+                    <li><a href="cases.html" data-i18n="nav.cases">案例</a></li>
+                    <li><a href="faq.html" data-i18n="nav.faq">FAQ</a></li>
+                    <li><a href="inquiry.html" data-i18n="nav.inquiry">询价</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 data-i18n="footer.categories">产品分类</h4>
+                <ul id="footerCategories">
+                    <!-- 页脚分类将通过JavaScript动态渲染 -->
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 data-i18n="footer.contactUs">联系我们</h4>
+                <ul>
+                    <li id="footerAddress">📍 杭州余杭区户外装备产业园</li>
+                    <li id="footerPhone">📞 400-888-9999</li>
+                    <li id="footerEmail">✉️ info@freemanoutdoor.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-i18n="footer.copyright">© 2026 FREE MAN Outdoor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="site-data.js"></script>
+    <script>
+        // 获取后台数据（已在 site-data.js 中定义）
+
+        // 获取分类名称
+        function getCategoryName(id) {
+            const data = getSiteData();
+            if (data && data.categories) {
+                const cat = data.categories.find(function(c) { return c.id === id; });
+                if (cat) return cat.name;
+            }
+            return '';
+        }
+
+        // 加载配置数据
+        function loadConfig() {
+            const data = getSiteData();
+            if (!data || !data.config) return;
+
+            // 设置首页大图
+            if (data.config.heroImage && document.getElementById('heroBg')) {
+                document.getElementById('heroBg').src = data.config.heroImage;
+            }
+            // 设置Hero标题
+            if (data.config.heroTitle && document.getElementById('heroTitle')) {
+                document.getElementById('heroTitle').innerHTML = data.config.heroTitle;
+            }
+            // 设置Hero副标题
+            if (data.config.heroSubtitle && document.getElementById('heroSubtitle')) {
+                document.getElementById('heroSubtitle').textContent = data.config.heroSubtitle;
+            }
+            // 设置页脚联系信息
+            if (data.config.phone && document.getElementById('footerPhone')) {
+                document.getElementById('footerPhone').textContent = '📞 ' + data.config.phone;
+            }
+            if (data.config.email && document.getElementById('footerEmail')) {
+                document.getElementById('footerEmail').textContent = '✉️ ' + data.config.email;
+            }
+            if (data.config.address && document.getElementById('footerAddress')) {
+                document.getElementById('footerAddress').textContent = '📍 ' + data.config.address;
+            }
+        }
+
+        // 渲染分类
+        function renderCategories() {
+            const data = getSiteData();
+            const grid = document.getElementById('categoryGrid');
+            const footerList = document.getElementById('footerCategories');
+            if (!data || !data.categories || data.categories.length === 0) return;
+
+            const defaultIcons = ['🚚', '🚐', '🚛', '🏕️', '⛺', '🔧', '🎒', '⚙️'];
+
+            // 首页分类卡片
+            if (grid) {
+                grid.innerHTML = data.categories.map(function(cat, index) {
+                    const icon = cat.icon || defaultIcons[index % defaultIcons.length];
+                    // 判断是否是图片URL
+                    const isImage = icon && (icon.startsWith('http') || icon.startsWith('/') || icon.startsWith('data:'));
+                    const iconHtml = isImage 
+                        ? '<img src="' + icon + '" alt="' + (cat.name || '') + '" style="width: 48px; height: 48px; object-fit: contain;">'
+                        : icon;
+                    return '<a href="products.html?cat=' + cat.id + '" class="category-card">' +
+                        '<div class="category-icon">' + iconHtml + '</div>' +
+                        '<h3>' + (cat.name || '') + '</h3>' +
+                    '</a>';
+                }).join('');
+            }
+
+            // 页脚分类列表
+            if (footerList) {
+                footerList.innerHTML = data.categories.map(function(cat) {
+                    return '<li><a href="products.html?cat=' + cat.id + '">' + (cat.name || '') + '</a></li>';
+                }).join('');
+            }
+        }
+
+        // 渲染精选产品
+        function renderFeaturedProducts() {
+            const data = getSiteData();
+            const grid = document.getElementById('featuredProductsGrid');
+            if (!grid) return;
+
+            let products = [];
+            if (data && data.products && data.products.length > 0) {
+                // 取前3个作为精选产品
+                products = data.products.slice(0, 3);
+            } else {
+                // 默认数据
+                products = [
+                    { id: 1, name: '远征者 X1 皮卡背驼', category: 1, price: '¥128,000', image: 'https://aka.doubaocdn.com/s/ocxD1wodQU', desc: '专为长途越野设计的皮卡背驼房箱，采用航空级铝合金框架，轻量化与强度兼备。' },
+                    { id: 2, name: '自由者 S1 皮卡露营车', category: 3, price: '¥168,000', image: 'https://aka.doubaocdn.com/s/dNRu1wodQQ', desc: '基于皮卡底盘打造的一体式露营车，兼顾日常通勤与户外露营。' },
+                    { id: 3, name: '行者 T1 拖挂房车', category: 4, price: '¥98,000', image: 'https://aka.doubaocdn.com/s/V27P1wodQR', desc: '轻量化拖挂房车，适合家庭长途旅行。独立卫浴、厨房、卧室一应俱全。' }
+                ];
+            }
+
+            grid.innerHTML = products.map(function(p) {
+                const catName = getCategoryName(p.category);
+                return '<a href="product-detail.html?id=' + p.id + '" class="product-card">' +
+                    '<img src="' + (p.image || '') + '" alt="' + (p.name || '') + '" class="product-image">' +
+                    '<div class="product-info">' +
+                        '<div class="product-category">' + (catName || '') + '</div>' +
+                        '<h3 class="product-name">' + (p.name || '') + '</h3>' +
+                        '<p class="product-desc">' + (p.desc || '') + '</p>' +
+                        '<div class="product-footer">' +
+                            '<span class="product-price">' + (p.price || '') + '</span>' +
+                            '<span class="product-link" data-i18n="products.learnMore">了解更多 →</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</a>';
+            }).join('');
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            renderCategories();
+            renderFeaturedProducts();
+        });
+    </script>
+    <script src="editable.js"></script>
+</body>
+</html>

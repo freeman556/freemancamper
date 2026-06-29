@@ -1,0 +1,13 @@
+[build]
+  publish = "."
+
+# 启用 Netlify Forms 功能（用于接收询价表单提交）
+[forms]
+  # 表单会自动识别，无需额外配置
+
+# 安全头配置
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"

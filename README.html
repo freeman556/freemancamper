@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREE MAN 皮卡露营车展示网站 - 使用手册</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f9f9f9;
+        }
+        .container {
+            background: #fff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        h1 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        h2 {
+            font-size: 22px;
+            color: #2a2a2a;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 4px solid #667eea;
+        }
+        h3 {
+            font-size: 18px;
+            color: #333;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .warning {
+            background: #fff8e1;
+            border-left: 4px solid #ffa000;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning h3 {
+            color: #f57c00;
+            margin-top: 0;
+        }
+        .tip {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            color: #e91e63;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 30px 0;
+        }
+        strong {
+            color: #1a1a1a;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .step h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="site-data.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🚚 FREE MAN 皮卡露营车展示网站 - 使用手册</h1>
+
+        <div class="warning">
+            <h3>📖 先读我！（非常重要）</h3>
+            <p>你好！这是一份专门为小白用户准备的超详细使用说明。请耐心看完，特别是「重要注意事项」部分，能帮你少走很多弯路。</p>
+        </div>
+
+        <hr>
+
+        <h2>🎯 这个网站是什么？</h2>
+        <p>这是一个<strong>皮卡露营装备展示网站</strong>，包含：</p>
+        <ul>
+            <li><span class="emoji">🏠</span><strong>首页</strong>：大图展示、产品分类、精选产品</li>
+            <li><span class="emoji">📦</span><strong>产品中心</strong>：产品列表、产品详情</li>
+            <li><span class="emoji">🔧</span><strong>配置器</strong>：可以选配不同配置，自动计算价格</li>
+            <li><span class="emoji">📸</span><strong>客户案例</strong>：展示用户使用案例</li>
+            <li><span class="emoji">❓</span><strong>FAQ</strong>：常见问题解答</li>
+            <li><span class="emoji">📝</span><strong>在线询价</strong>：客户可以填写询价表单</li>
+            <li><span class="emoji">🔐</span><strong>后台管理系统</strong>：可以修改网站内容</li>
+        </ul>
+
+        <hr>
+
+        <h2>⚠️ 重要注意事项（必看！）</h2>
+
+        <h3>1. 关于后台修改的数据</h3>
+        <div class="warning">
+            <p><strong>目前的后台管理系统，修改的数据只存在你自己的浏览器里！</strong></p>
+        </div>
+
+        <p>什么意思呢？</p>
+        <ul>
+            <li>✅ 你在自己电脑上修改后，你自己能看到效果</li>
+            <li>❌ 其他访客访问你的网站，看不到你修改的内容</li>
+            <li>❌ 换个浏览器、换台电脑、清除浏览器缓存，修改的内容就没了</li>
+        </ul>
+
+        <p><strong>为什么会这样？</strong></p>
+        <p>因为这是一个纯静态网站，没有后端服务器。数据存在浏览器的「本地存储」里，就像存在你自己电脑的记事本里，别人看不到。</p>
+
+        <p><strong>那怎么让所有人都看到修改后的内容？</strong></p>
+        <p>有两种方法：</p>
+        <ul>
+            <li><strong>方法一（推荐）</strong>：在后台改好后，用「数据导出」功能导出 JSON 文件，然后替换到代码里</li>
+            <li><strong>方法二</strong>：直接修改代码里的默认内容，然后重新上传到 GitHub</li>
+        </ul>
+
+        <h3>2. 关于图片</h3>
+        <p>网站里的产品图片、首页大图等，建议用网络图片链接（URL），不要用本地图片。</p>
+        <ul>
+            <li>可以把图片上传到图床（比如微博图床、阿里云OSS、七牛云等）</li>
+            <li>然后把图片链接填到后台里</li>
+        </ul>
+
+        <hr>
+
+        <h2>🚀 部署步骤：上传到 GitHub + 连接 Netlify</h2>
+
+        <h3>第一步：注册账号</h3>
+        <p>你需要注册两个账号（都是免费的）：</p>
+        <ol>
+            <li><strong>GitHub</strong>：<a href="https://github.com" target="_blank">https://github.com</a> （用来存网站代码）</li>
+            <li><strong>Netlify</strong>：<a href="https://www.netlify.com" target="_blank">https://www.netlify.com</a> （用来把网站放到网上）</li>
+        </ol>
+
+        <h3>第二步：把网站上传到 GitHub</h3>
+
+        <div class="step">
+            <h4>方法一：网页上传（最简单，推荐小白）</h4>
+            <ol>
+                <li>登录 GitHub，点击右上角的 <strong>+</strong> 号，选择 <strong>New repository</strong></li>
+                <li>填写仓库信息：
+                    <ul>
+                        <li><strong>Repository name</strong>：随便起个名字，比如 <code>freeman-camper</code></li>
+                        <li><strong>Public</strong>：选这个（公开的，Netlify 才能访问）</li>
+                        <li>不用勾选其他选项</li>
+                    </ul>
+                </li>
+                <li>点击 <strong>Create repository</strong></li>
+                <li>找到页面中间的 <strong>uploading an existing file</strong> 链接，点它</li>
+                <li>打开你电脑上的 <code>freeman-camper</code> 文件夹，把<strong>里面所有文件和文件夹</strong>都拖进去
+                    <br><small>注意：是拖文件夹<strong>里面</strong>的内容，不是拖整个文件夹！</small>
+                </li>
+                <li>拖完后，点击页面底部的 <strong>Commit changes</strong></li>
+                <li>完成！代码已经上传到 GitHub 了</li>
+            </ol>
+        </div>
+
+        <h3>第三步：连接 Netlify，把网站放到网上</h3>
+        <ol>
+            <li>登录 Netlify：<a href="https://app.netlify.com" target="_blank">https://app.netlify.com</a></li>
+            <li>点击 <strong>Add new site</strong> → <strong>Import an existing project</strong></li>
+            <li>选择 <strong>GitHub</strong>（第一次用会让你授权，点同意就行）</li>
+            <li>找到你刚才创建的仓库，点它</li>
+            <li>部署设置页面：
+                <ul>
+                    <li><strong>Branch to deploy</strong>：选 <code>main</code> 或者 <code>master</code>（一般默认就行）</li>
+                    <li><strong>Build command</strong>：<strong>留空！什么都不用填</strong></li>
+                    <li><strong>Publish directory</strong>：<strong>留空！或者填 <code>.</code></strong>（就是当前目录）</li>
+                </ul>
+            </li>
+            <li>点击 <strong>Deploy site</strong></li>
+            <li>等待 1-2 分钟，网站就部署好了！</li>
+        </ol>
+
+        <h3>第四步：查看你的网站</h3>
+        <p>部署成功后，Netlify 会给你一个网址，类似：</p>
+        <p><code>https://随机名字.netlify.app</code></p>
+        <p>点击这个网址，就能看到你的网站了！</p>
+
+        <div class="success">
+            <p><strong>🎉 恭喜！你的网站已经上线了！</strong></p>
+        </div>
+
+        <h3>第五步（可选）：绑定自己的域名</h3>
+        <p>如果你有自己的域名，可以在 Netlify 后台绑定：</p>
+        <ol>
+            <li>进入网站设置，找到 <strong>Domain settings</strong></li>
+            <li>点击 <strong>Add custom domain</strong></li>
+            <li>按照提示操作，需要去域名服务商那里改 DNS 解析</li>
+            <li>不会弄的话，可以搜一下「Netlify 绑定域名」教程，很多的</li>
+        </ol>
+
+        <hr>
+
+        <h2>🔐 后台管理系统怎么用？</h2>
+
+        <h3>怎么打开后台？</h3>
+        <p>在你的网站地址后面加上 <code>/admin/</code> 就行。</p>
+        <p>比如：</p>
+        <ul>
+            <li>你的网站是 <code>https://xxx.netlify.app</code></li>
+            <li>后台地址就是 <code>https://xxx.netlify.app/admin/</code></li>
+        </ul>
+        <div class="tip">
+            <p><strong>默认密码</strong>：<code>admin321</code></p>
+        </div>
+
+        <h3>后台能改什么？</h3>
+        <p>登录后台后，左边有菜单，可以修改：</p>
+        <ol>
+            <li><strong>📦 产品管理</strong>
+                <ul>
+                    <li>添加新产品</li>
+                    <li>编辑已有产品（名字、价格、图片、描述等）</li>
+                    <li>删除产品</li>
+                </ul>
+            </li>
+            <li><strong>📂 分类管理</strong>
+                <ul>
+                    <li>添加产品分类</li>
+                    <li>编辑分类名称和图标</li>
+                    <li>删除分类</li>
+                </ul>
+            </li>
+            <li><strong>📝 表单管理</strong>
+                <ul>
+                    <li>查看客户提交的询价表单</li>
+                    <li>删除表单记录</li>
+                </ul>
+            </li>
+            <li><strong>⚙️ 网站配置</strong>
+                <ul>
+                    <li>修改网站名称</li>
+                    <li>修改联系方式（电话、邮箱、地址）</li>
+                    <li>上传/修改 Logo</li>
+                    <li>上传/修改首页大图</li>
+                    <li>修改首页的标题和副标题</li>
+                </ul>
+            </li>
+        </ol>
+
+        <div class="warning">
+            <p><strong>⚠️ 再次提醒</strong></p>
+            <p>后台修改的内容，<strong>只有你自己的浏览器能看到</strong>！其他人访问网站看到的还是默认内容。</p>
+            <p>想让所有人都看到修改后的内容，需要导出数据替换到代码里，往下看 ↓</p>
+        </div>
+
+        <hr>
+
+        <h2>✏️ 怎么修改网站默认内容（让所有人都能看到）</h2>
+
+        <p>如果你想让所有访客都看到修改后的内容，需要把后台修改的数据导出，然后替换到代码里。</p>
+
+        <h3>最简单的方法：后台导出 + 替换文件</h3>
+        <ol>
+            <li>登录后台，修改好产品、分类、配置等所有内容</li>
+            <li>进入「全局设置」→「数据管理」</li>
+            <li>点击「📤 导出数据」，会下载一个 <code>freeman-data.json</code> 文件</li>
+            <li>打开下载的 JSON 文件，全选复制</li>
+            <li>打开 <code>assets/js/data.js</code> 文件，找到 <code>var defaultData = {</code> 这一行</li>
+            <li>把后面的内容替换成你复制的 JSON 数据</li>
+            <li>保存文件，重新上传到 GitHub</li>
+            <li>等 1-2 分钟，Netlify 会自动更新网站！</li>
+        </ol>
+
+        <h3>方法二：直接在 GitHub 上编辑</h3>
+        <p>如果你只是改一两个地方，也可以直接在 GitHub 上编辑：</p>
+        <ol>
+            <li>打开你的 GitHub 仓库</li>
+            <li>找到要修改的文件，点击进去</li>
+            <li>点击右上角的铅笔图标（Edit this file）</li>
+            <li>修改内容</li>
+            <li>拉到页面底部，点击 <strong>Commit changes</strong></li>
+            <li>等 1-2 分钟，Netlify 会自动更新网站！</li>
+        </ol>
+
+        <h3>具体改哪些文件？</h3>
+
+        <h4>1. 修改产品、分类、案例、FAQ 等内容</h4>
+        <p>主要改这个文件：<code>assets/js/data.js</code></p>
+        <p>用文本编辑器打开，找到对应的部分修改就行。比如：</p>
+        <ul>
+            <li><code>categories</code> 是分类</li>
+            <li><code>products</code> 是产品</li>
+            <li><code>cases</code> 是案例</li>
+            <li><code>faqs</code> 是常见问题</li>
+        </ul>
+
+        <h4>2. 修改配置器的产品和价格</h4>
+        <p>配置器的数据在 <code>configurator.html</code> 文件里，是内嵌的 JS 代码。</p>
+        <p>这个比较复杂，建议找懂点代码的人帮你改，或者用后台的配置器管理功能改好后导出。</p>
+
+        <h4>3. 修改首页文字、联系方式等</h4>
+        <p>也是在 <code>assets/js/data.js</code> 里的 <code>config</code> 部分。</p>
+
+        <hr>
+
+        <h2>📋 网站文件说明（了解一下就行）</h2>
+        <pre>
+freeman-camper/
+├── index.html              # 首页
+├── products.html           # 产品列表页
+├── product-detail.html     # 产品详情页
+├── configurator.html       # 配置器页面
+├── cases.html              # 客户案例页
+├── faq.html                # 常见问题页
+├── inquiry.html            # 询价页面
+├── admin/
+│   └── index.html          # 后台管理系统
+├── assets/
+│   ├── css/
+│   │   └── style.css       # 样式文件（改外观的）
+│   ├── js/
+│   │   ├── data.js         # 【重要】默认数据都在这里
+│   │   └── i18n.js         # 中英文切换
+│   └── images/             # 图片文件夹（建议用网络图）
+├── data/
+│   └── auth.json           # 后台密码加密文件（备用）
+├── netlify.toml            # Netlify 配置文件
+├── .gitignore              # Git 忽略文件
+└── README.md / README.html # 使用说明
+        </pre>
+
+        <hr>
+
+        <h2>❓ 常见问题</h2>
+
+        <h3>Q1：我改了后台，为什么别人看不到？</h3>
+        <p>A：因为数据存在你自己的浏览器里。想让所有人看到，需要导出数据替换到代码里，参考上面「怎么修改网站默认内容」。</p>
+
+        <h3>Q2：询价表单提交后，我怎么收到通知？</h3>
+        <p>A：我已经帮你配置好了 Netlify Forms！部署后：</p>
+        <ol>
+            <li>客户填写询价表单并提交</li>
+            <li>你可以在 Netlify 后台的 <strong>Forms</strong> 菜单里看到所有提交</li>
+            <li>还可以设置邮件通知，有人提交就发邮件告诉你</li>
+        </ol>
+        <p><strong>设置邮件通知的方法：</strong></p>
+        <ol>
+            <li>进入 Netlify 网站后台</li>
+            <li>点击 <strong>Forms</strong> 菜单</li>
+            <li>找到 <strong>Notifications</strong></li>
+            <li>添加邮件通知，填你的邮箱就行</li>
+        </ol>
+        <p>另外，表单数据也会存在浏览器本地，你可以在网站后台的「表单管理」里看到（但只有你自己的浏览器能看到）。</p>
+
+        <h3>Q3：配置器的询价我也能收到吗？</h3>
+        <p>A：可以！我也帮你配置好了。配置器的「提交配置获取报价」功能也接入了 Netlify Forms。</p>
+        <ul>
+            <li>客户选好配置后填写联系信息提交</li>
+            <li>你可以在 Netlify 后台的 <strong>Forms</strong> 菜单里看到，表单名叫 <code>configurator-quote</code></li>
+            <li>里面包含客户选的所有配置详情和联系信息</li>
+            <li>同样可以设置邮件通知</li>
+        </ul>
+
+        <h3>Q4：图片上传不了怎么办？</h3>
+        <p>A：纯静态网站不能直接上传图片。建议：</p>
+        <ol>
+            <li>把图片上传到图床（比如阿里云OSS、七牛云、微博图床等）</li>
+            <li>复制图片链接</li>
+            <li>粘贴到后台的图片地址输入框里</li>
+        </ol>
+
+        <h3>Q5：怎么修改后台密码？</h3>
+        <p>A：有两种方法：</p>
+        <ol>
+            <li><strong>方法一（推荐）</strong>：登录后台，进入「全局设置」→「修改管理员密码」，直接改就行（但只存在当前浏览器）</li>
+            <li><strong>方法二</strong>：直接修改代码里的默认密码，在 <code>admin/index.html</code> 里搜索 <code>admin321</code> 改成你想要的密码</li>
+        </ol>
+
+        <h3>Q6：网站打开慢怎么办？</h3>
+        <p>A：可能是图片太大了。建议：</p>
+        <ul>
+            <li>图片压缩后再上传</li>
+            <li>用 CDN 加速图片</li>
+            <li>产品图片不要太大，控制在 500KB 以内比较好</li>
+        </ul>
+
+        <hr>
+
+        <div class="success">
+            <h3>🎉 最后</h3>
+            <p>祝你网站上线顺利！有了自己的网站，生意兴隆！🚀</p>
+            <p>如果遇到问题，先把这份说明再看一遍，很多问题都有答案。</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,3980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurator - FREE MAN</title>
+    <script>
+        // 从后台设置读取页面标题
+        try {
+            const savedData = localStorage.getItem('freeman_data');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.config && data.config.pageTitle) {
+                    document.title = data.config.pageTitle;
+                }
+            }
+        } catch(e) {}
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #1a1a1a;
+            background: #ffffff;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .navbar {
+            background: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            backdrop-filter: blur(10px);
+        }
+        .nav-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a1a1a;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #b3541e;
+            font-size: 14px;
+            border: 2px solid #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+            position: relative;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #b3541e;
+        }
+        .nav-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #b3541e;
+            border-radius: 1px;
+        }
+        .lang-switch {
+            padding: 6px 12px;
+            border-left: 1px solid #e0e0e0;
+            margin-left: 8px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .lang-switch:hover {
+            color: #b3541e;
+        }
+        .page-header {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+        .page-header .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #f0eee9;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .page-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .page-header p {
+            color: #666;
+            font-size: 17px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .configurator-page {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 32px 60px;
+            display: flex;
+            gap: 32px;
+        }
+        .config-main {
+            flex: 1;
+            min-width: 0;
+        }
+        .config-sidebar {
+            width: 340px;
+            position: sticky;
+            top: 100px;
+            align-self: flex-start;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+        .config-sidebar.visible {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        .product-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            border-color: rgba(200, 90, 23, 0.2);
+        }
+        .product-card.selected {
+            border-color: #b3541e;
+            box-shadow: 0 12px 40px rgba(200, 90, 23, 0.15);
+        }
+        .product-card-images {
+            display: block;
+            background: #f0f0f0;
+            position: relative;
+            aspect-ratio: 16/10;
+            overflow: hidden;
+        }
+        .product-card-images img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .product-card:hover .product-card-images img {
+            transform: scale(1.05);
+        }
+        .product-price-badge {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(200, 90, 23, 0.95);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            z-index: 2;
+        }
+        .product-card-info {
+            padding: 28px;
+        }
+        .product-card-info h3 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        .product-card-info p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+        .product-price .label {
+            font-size: 13px;
+            color: #999;
+            font-weight: 500;
+        }
+        .product-price .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #b3541e;
+            letter-spacing: -0.5px;
+        }
+        .start-config-btn {
+            width: 100%;
+            padding: 16px;
+            background: #b3541e;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .start-config-btn:hover {
+            background: #9a481a;
+            transform: translateY(-1px);
+        }
+        .start-config-btn:active {
+            transform: translateY(0);
+        }
+        .section {
+            background: #fff;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: box-shadow 0.3s;
+        }
+        .section:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .section-header {
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .section-header:hover {
+            background: #fafafa;
+        }
+        .section-title {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .section-title .icon {
+            font-size: 22px;
+            margin-top: 2px;
+        }
+        .section-title h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .section-title p {
+            font-size: 13px;
+            color: #888;
+        }
+        .section-toggle {
+            font-size: 20px;
+            color: #999;
+            transition: transform 0.3s ease;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .section-header:hover .section-toggle {
+            background: #f5f5f5;
+        }
+        .section.collapsed .section-toggle {
+            transform: rotate(-90deg);
+        }
+        .section.collapsed .section-content {
+            display: none;
+        }
+        .section-content {
+            padding: 28px;
+        }
+        .standard-config {
+            background: linear-gradient(135deg, #f6faf3 0%, #f0f7eb 100%);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 32px;
+            border: 1px solid #e8f5e0;
+        }
+        .standard-config h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2d7a1e;
+        }
+        .standard-config h3 .icon {
+            color: #52c41a;
+            font-size: 22px;
+        }
+        .standard-config .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .config-item {
+            background: #fff;
+            padding: 16px;
+            border-radius: 10px;
+            display: flex;
+            gap: 12px;
+            border: 1px solid #e8f5e0;
+            transition: all 0.2s;
+        }
+        .config-item:hover {
+            border-color: #b7eb8f;
+            transform: translateY(-1px);
+        }
+        .config-item .check {
+            color: #52c41a;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .config-item .info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1a1a1a;
+        }
+        .config-item .info p {
+            font-size: 12px;
+            color: #777;
+            line-height: 1.5;
+        }
+        .config-item .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #f6ffed;
+            color: #52c41a;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .option-card {
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #fff;
+        }
+        .option-card:hover {
+            border-color: #e8a87c;
+            background: #fffaf7;
+        }
+        .option-card.selected {
+            border-color: #b3541e;
+            background: #fff9f5;
+            box-shadow: 0 4px 12px rgba(200, 90, 23, 0.1);
+        }
+        .option-card.multiple {
+            position: relative;
+        }
+        .option-card.multiple.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: #b3541e;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(200, 90, 23, 0.3);
+        }
+        .option-card-header {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+        .option-icon {
+            width: 44px;
+            height: 44px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+        .option-card.selected .option-icon {
+            background: #fff3eb;
+        }
+        .option-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .option-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .option-info p {
+            font-size: 13px;
+            color: #777;
+            line-height: 1.5;
+        }
+        .option-price {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #fff5ee;
+            color: #b3541e;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+        .option-price.included {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        .option-price.free {
+            background: #f0f9ff;
+            color: #1890ff;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #fff5ee;
+            color: #b3541e;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .upgrade-title {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-top: 40px;
+        }
+        .upgrade-title:first-child {
+            margin-top: 0;
+        }
+        .upgrade-subtitle {
+            color: #777;
+            margin-bottom: 24px;
+            font-size: 15px;
+        }
+        .addon-title {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-top: 48px;
+        }
+        .addon-subtitle {
+            color: #777;
+            margin-bottom: 24px;
+            font-size: 15px;
+        }
+        .price-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .price-card h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .current-product-info {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 16px;
+        }
+        .current-product-info h4 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .price-item.base {
+            color: #999;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 8px;
+        }
+        .price-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-top: 2px solid #f0f0f0;
+            margin-top: 12px;
+        }
+        .price-total .label {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .price-total .value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #b3541e;
+            letter-spacing: -1px;
+        }
+        .quote-btn {
+            width: 100%;
+            padding: 16px;
+            background: #b3541e;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .quote-btn:hover {
+            background: #9a481a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 90, 23, 0.3);
+        }
+        .back-btn {
+            width: 100%;
+            padding: 14px;
+            background: #fff;
+            color: #555;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            border-color: #b3541e;
+            color: #b3541e;
+            background: #fffaf7;
+        }
+        .config-detail-view {
+            display: none;
+        }
+        .config-detail-view.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .product-select-view.hidden {
+            display: none;
+        }
+        .current-product-banner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+        .product-gallery {
+            display: block;
+            background: #f0f0f0;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+        .product-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-gallery img:nth-child(even) {
+            transform: scaleX(-1);
+        }
+        .product-info-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .product-info-panel h4 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .product-info-panel .product-desc {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .price-row .price-label {
+            font-size: 15px;
+            color: #666;
+            font-weight: 500;
+            min-width: 80px;
+        }
+        .price-row .price-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1a1a1a;
+            letter-spacing: -1px;
+        }
+        .price-row .price-value.total {
+            color: #b3541e;
+        }
+        .config-detail-view .page-header-content {
+            display: none;
+        }
+        .footer {
+            background: #1a1a1a;
+            color: #999;
+            padding: 60px 0 30px;
+            margin-top: 80px;
+        }
+        .footer-content {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+        .footer-brand h3 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+        }
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 320px;
+        }
+        .footer-column h4 {
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column li {
+            margin-bottom: 12px;
+        }
+        .footer-column a {
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .footer-column a:hover {
+            color: #b3541e;
+        }
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding-left: 32px;
+            padding-right: 32px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            width: 520px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal-close {
+            cursor: pointer;
+            font-size: 20px;
+            color: #999;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .modal-body {
+            padding: 28px;
+        }
+        .quote-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .quote-item.total {
+            font-weight: 800;
+            font-size: 22px;
+            color: #b3541e;
+            border-bottom: none;
+            padding-top: 20px;
+            margin-top: 12px;
+            border-top: 2px solid #f0f0f0;
+        }
+        .quote-section-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin: 20px 0 10px;
+            color: #333;
+        }
+        .quote-section-title:first-child {
+            margin-top: 0;
+        }
+        @media (max-width: 1200px) {
+            .product-selector {
+                gap: 24px;
+            }
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 1024px) {
+            .configurator-page {
+                flex-direction: column;
+            }
+            .config-sidebar {
+                width: 100%;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto;
+                z-index: 99;
+                border-radius: 20px 20px 0 0;
+                transform: translateY(100%);
+            }
+            .config-sidebar.visible {
+                transform: translateY(0);
+            }
+            .price-card {
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            }
+            .config-grid,
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 20px;
+                height: 60px;
+            }
+            .nav-menu {
+                gap: 20px;
+            }
+            .nav-menu a {
+                font-size: 14px;
+            }
+            .page-header {
+                padding: 40px 20px 30px;
+            }
+            .page-header h1 {
+                font-size: 32px;
+            }
+            .page-header p {
+                font-size: 15px;
+            }
+            .configurator-page {
+                padding: 0 20px 40px;
+            }
+            .product-selector {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .config-grid,
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .current-product-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-content {
+                grid-template-columns: 1fr 2fr;
+                gap: 30px;
+            }
+        }
+    </style>
+    <script src="site-data.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">FM</div>
+                <span>FREE MAN</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="products.html">产品</a></li>
+                <li><a href="configurator.html" class="active">配置器</a></li>
+                <li><a href="cases.html">案例</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="inquiry.html">询价</a></li>
+                <li class="lang-switch">EN</li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="badge">在线配置器</div>
+        <h1 id="pageTitle">选择您的产品</h1>
+        <p id="pageSubtitle">选择一款产品开始配置，打造您的专属户外露营装备。</p>
+    </div>
+
+    <div class="configurator-page">
+        <div class="config-main">
+            <!-- 产品选择视图 -->
+            <div class="product-select-view" id="productSelectView">
+                <div class="product-selector" id="productSelector">
+                    <!-- 动态生成产品卡片 -->
+                </div>
+            </div>
+
+            <!-- 配置详情视图 -->
+            <div class="config-detail-view" id="configDetailView">
+                <div class="current-product-banner">
+                    <div class="product-gallery">
+                        <img id="galleryImg1" src="" alt="">
+                    </div>
+                    <div class="product-info-panel">
+                        <h4 id="currentProductName">半箱</h4>
+                        <p class="product-desc" id="currentProductDesc"></p>
+                        <div class="price-row">
+                            <span class="price-label">基础价格</span>
+                            <span class="price-value" id="detailBasePrice">$3,149.10</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">实时总价</span>
+                            <span class="price-value total" id="detailTotalPrice">$3,149.10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="configGroupsContainer">
+                    <!-- 动态生成配置分组 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边价格栏 -->
+        <div class="config-sidebar" id="configSidebar">
+            <div class="price-card">
+                <h3>当前配置</h3>
+                <div class="current-product-info">
+                    <h4 id="sidebarProductName">半箱</h4>
+                </div>
+                <div class="price-item base">
+                    <span>基础价格</span>
+                    <span id="basePrice">$3,149.10</span>
+                </div>
+                <div id="upgradeItems"></div>
+                <div class="price-total">
+                    <span class="label">总价</span>
+                    <span class="value" id="totalPrice">$3,149.10</span>
+                </div>
+                <button class="quote-btn" onclick="generateQuote()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    生成报价单
+                </button>
+                <button class="back-btn" onclick="backToProductSelect()">
+                    ← 返回产品选择
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 报价单弹窗 -->
+    <div class="modal" id="quoteModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>配置报价单</h3>
+                <span class="modal-close" onclick="closeModal('quoteModal')">✕</span>
+            </div>
+            <div class="modal-body">
+                <div id="quoteContent"></div>
+                <form name="configurator-quote" data-netlify="true" netlify-honeypot="bot-field" id="quoteForm" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+                    <input type="hidden" name="form-name" value="configurator-quote">
+                    <p class="hidden" style="display:none;">
+                        <label>Don't fill this out if you're human: <input name="bot-field"></label>
+                    </p>
+                    <input type="hidden" name="config-details" id="configDetailsInput">
+                    <h4 style="margin-bottom: 16px; font-size: 16px;">您的联系信息</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; font-size: 14px;">姓名</label>
+                            <input type="text" id="quoteName" name="name" placeholder="请输入您的姓名" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 6px; font-size: 14px;">电话</label>
+                            <input type="tel" id="quotePhone" name="phone" placeholder="请输入联系电话" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; margin-bottom: 6px; font-size: 14px;">邮箱（选填）</label>
+                        <input type="email" id="quoteEmail" name="email" placeholder="请输入邮箱地址" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 14px;">备注（选填）</label>
+                        <textarea id="quoteRemark" name="remark" placeholder="其他需求或说明" rows="2" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px;">
+                <button class="btn btn-default" onclick="closeModal('quoteModal')" style="padding: 10px 20px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer;">关闭</button>
+                <button class="btn btn-primary" id="submitQuoteBtn" onclick="submitQuote()" style="padding: 10px 24px; background: #667eea; color: #fff; border: none; border-radius: 6px; cursor: pointer;">提交配置获取报价</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>
+                    <div class="logo-icon" style="width: 36px; height: 36px; font-size: 13px;">FM</div>
+                    FREE MAN
+                </h3>
+                <p>专注户外皮卡露营装备研发与制造，为每一位冒险者提供可靠的移动家园。</p>
+            </div>
+            <div class="footer-column">
+                <h4>快速链接</h4>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="products.html">产品</a></li>
+                    <li><a href="configurator.html">配置器</a></li>
+                    <li><a href="cases.html">案例</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>产品分类</h4>
+                <ul>
+                    <li><a href="products.html?cat=1">皮卡背驼</a></li>
+                    <li><a href="products.html?cat=3">皮卡露营车</a></li>
+                    <li><a href="products.html?cat=4">拖挂房车</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>联系我们</h4>
+                <ul>
+                    <li id="footerAddress">📍 山东潍坊</li>
+                    <li id="footerPhone">📞 400-888-9999</li>
+                    <li id="footerEmail">✉️ info@freemanoutdoor.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 FREE MAN Outdoor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 价格格式化函数 - 添加千分位
+        function formatPrice(price) {
+            return '$' + price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        // 默认配置数据
+        const defaultConfiguratorData = {
+            configProducts: [
+                {
+                    id: 'half',
+                    name: '半箱',
+                    price: 3149.1,
+                    image: 'https://aka.doubaocdn.com/s/kLsM1wgX1c',
+                    desc: '轻量灵活的半箱式皮卡背驼，适合日常露营与短途旅行。标配齐全，升级选项丰富，按需加配打造专属户外装备。',
+                    groups: [
+                        {
+                            id: 'half_standard',
+                            name: '标准配置',
+                            type: 'standard',
+                            desc: '以下项目已包含在基础价格中，无需额外付费',
+                            items: [
+                                {
+                                    id: 'hs1',
+                                    name: '一页搭建完整套装 - 皮卡硬壳露营舱',
+                                    desc: 'Build Your Complete Setup in One Page - Pickup Hard-Side Camper',
+                                    price: 0,
+                                    isDefault: true
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_1',
+                            name: '颜色',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的颜色',
+                            items: [
+                                {
+                                    id: 'half_1_1',
+                                    name: '全黑（单件）',
+                                    desc: 'All Black (single unit)',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_1_2',
+                                    name: '黑灰（单件）',
+                                    desc: 'Black&Grey (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_1_3',
+                                    name: '白灰（单件）',
+                                    desc: 'White&Grey (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_1_4',
+                                    name: '白黑（单件）',
+                                    desc: 'White&Black (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_1_5',
+                                    name: '全白（单件）',
+                                    desc: 'All White (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_1_6',
+                                    name: '全灰（单件）',
+                                    desc: 'All Grey (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_2',
+                            name: '车厢罩宽度',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的车厢罩宽度',
+                            items: [
+                                {
+                                    id: 'half_2_1',
+                                    name: '标准车厢罩',
+                                    desc: 'Standard Canopy',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_2_2',
+                                    name: '加宽车厢罩（6.5英尺/1950毫米宽，单件）',
+                                    desc: 'Widened Canopy (6.5ft/1950mm width) (single unit)',
+                                    price: 630.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_2_3',
+                                    name: '加宽车厢罩（6英尺/1800毫米宽，单件）',
+                                    desc: 'Widened Canopy (6ft/1800mm width) (single unit)',
+                                    price: 450.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_3',
+                            name: '后部车厢门样式',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的后部车厢门样式',
+                            items: [
+                                {
+                                    id: 'half_3_1',
+                                    name: '标准上翻门',
+                                    desc: 'Standard pop up door',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_3_2',
+                                    name: '双开尾门（移除皮卡尾门）',
+                                    desc: 'Double barn door(remove truck tailgate)',
+                                    price: 360.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_3_3',
+                                    name: '加固单门带备胎架（移除皮卡尾门）',
+                                    desc: 'Extra sturdy single door with tire rack(remove truck tailgate)',
+                                    price: 900.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_3_4',
+                                    name: '双开尾门（保留皮卡尾门）',
+                                    desc: 'Double barn door(keep truck tailgate)',
+                                    price: 360.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_4',
+                            name: '不同厚度床垫',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的不同厚度床垫',
+                            items: [
+                                {
+                                    id: 'half_4_1',
+                                    name: '标准1.6英寸/4厘米床垫（单件）',
+                                    desc: 'Standard 1.6in/4cm Mattress (single unit)',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_4_2',
+                                    name: '3.1英寸/8厘米厚床垫（下单前查看详情，单件）',
+                                    desc: '3.1in/8cm Thick Mattress（Check details before ordering.） (single unit)',
+                                    price: 142.2,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_4_3',
+                                    name: '2.4英寸/6厘米厚床垫（单件）',
+                                    desc: '2.4in/6cm Thick Mattress (single unit)',
+                                    price: 136.8,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_5',
+                            name: '帐篷长边窗帘',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的帐篷长边窗帘',
+                            items: [
+                                {
+                                    id: 'half_5_1',
+                                    name: '皮卡露营舱魔术贴窗帘（单件）',
+                                    desc: 'Pickup Camper Velcro Window Curtain (single unit)',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_5_2',
+                                    name: '拉链窗帘（单件）',
+                                    desc: 'Zippered curtains (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_5_3',
+                                    name: '轨道窗帘（单件）',
+                                    desc: 'Track curtains (single unit)',
+                                    price: 90.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_6',
+                            name: '帐篷短边窗帘',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的帐篷短边窗帘',
+                            items: [
+                                {
+                                    id: 'half_6_1',
+                                    name: '皮卡露营舱魔术贴窗帘（单件）',
+                                    desc: 'Pickup Camper Velcro Window Curtain (single unit)',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_6_2',
+                                    name: '拉链窗帘（单件）',
+                                    desc: 'Zippered curtains (single unit)',
+                                    price: 0.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_7',
+                            name: '车厢罩前窗',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择您喜欢的车厢罩前窗',
+                            items: [
+                                {
+                                    id: 'half_7_1',
+                                    name: '前部标准滑窗（单件）',
+                                    desc: 'Base Standard Sliding Window - Front (single unit)',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'half_7_2',
+                                    name: '前部加大滑窗（单件）',
+                                    desc: 'Base Oversized Sliding Window - Front (single unit)',
+                                    price: 135.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_8',
+                            name: '270度自立扇形遮阳篷',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择270度自立扇形遮阳篷类型',
+                            items: [
+                                {
+                                    id: 'half_8_1',
+                                    name: '270度自立扇形遮阳篷-基础版',
+                                    desc: '270° Freestanding Fan Awning-Basic Version',
+                                    price: 321.3,
+                                    isDefault: true,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_8_2',
+                                    name: '270度自立扇形遮阳篷-扩展版',
+                                    desc: '270° Freestanding Fan Awning-Expansion Version',
+                                    price: 449.1,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_9',
+                            name: '超轻铝壳270度遮阳篷',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择超轻铝壳270度遮阳篷类型',
+                            items: [
+                                {
+                                    id: 'half_9_1',
+                                    name: '2.5米超轻铝壳270度遮阳篷-碳纤维支杆',
+                                    desc: '2.5M Ultralight aluminum shell 270° Awning - carbon fiber strut',
+                                    price: 686.7,
+                                    isDefault: true,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_9_2',
+                                    name: '2米超轻铝壳270度遮阳篷-碳纤维支杆',
+                                    desc: '2M Ultralight aluminum shell 270° Awning - carbon fiber strut',
+                                    price: 656.1,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_10',
+                            name: '270度自立扇形遮阳篷围墙',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择270度自立扇形遮阳篷围墙类型',
+                            items: [
+                                {
+                                    id: 'half_10_1',
+                                    name: '270度自立扇形遮阳篷围墙-扩展版',
+                                    desc: '270° Freestanding Fan Awning Wall -Expansion Version',
+                                    price: 372.6,
+                                    isDefault: true,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_10_2',
+                                    name: '270度自立扇形遮阳篷围墙-基础版',
+                                    desc: '270° Freestanding Fan Awning Wall -Basic Version',
+                                    price: 217.8,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_11',
+                            name: '车顶天窗',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择车顶天窗类型',
+                            items: [
+                                {
+                                    id: 'half_11_1',
+                                    name: '车顶天窗 960*650（单件）',
+                                    desc: 'Roof Hatch 960*650 (single unit)',
+                                    price: 540.0,
+                                    isDefault: true,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'half_11_2',
+                                    name: '车顶天窗 800*500（单件）',
+                                    desc: 'Roof Hatch 800*500 (single unit)',
+                                    price: 450.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'half_addons',
+                            name: '可选配件',
+                            type: 'addon',
+                            isSingle: false,
+                            desc: '按需加配，打造专属户外装备',
+                            items: [
+                                {
+                                    id: 'hao1',
+                                    name: '内侧 Molle 面板 - 兼容标准车厢罩',
+                                    desc: 'Inside Molly Panels - Compatible with Standard Canopy',
+                                    price: 144.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao2',
+                                    name: '外侧 Molle 面板',
+                                    desc: 'Outer molle panel',
+                                    price: 76.5,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao3',
+                                    name: '外侧挂钩',
+                                    desc: 'Outer hooks',
+                                    price: 76.5,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao4',
+                                    name: '厨房模块',
+                                    desc: 'Kitchen',
+                                    price: 256.5,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao5',
+                                    name: '车厢罩单侧窗',
+                                    desc: 'One Side Window of Canopy',
+                                    price: 90.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao6',
+                                    name: '保护罩',
+                                    desc: 'Cover',
+                                    price: 349.2,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao7',
+                                    name: '四个支撑千斤顶',
+                                    desc: '4-JACKS',
+                                    price: 450.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao8',
+                                    name: '帐篷内饰高级防污皮革（单件）',
+                                    desc: 'Premium Anti-Stain Leather for Tent Interiors (single unit)',
+                                    price: 180.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao9',
+                                    name: '排风扇',
+                                    desc: 'Exhaust fan',
+                                    price: 180.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao10',
+                                    name: '柔性400W太阳能板+控制器',
+                                    desc: 'Solar panel - soft 400W + controller',
+                                    price: 261.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao11',
+                                    name: '顶部行李架（单件）',
+                                    desc: 'Top roof rack（Single unit）',
+                                    price: 45.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao12',
+                                    name: '保温内衬',
+                                    desc: 'Thermal insulation liner',
+                                    price: 153.9,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao13',
+                                    name: '防冷凝垫',
+                                    desc: 'The condensation pad',
+                                    price: 49.5,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao14',
+                                    name: '布壳车辆侧遮阳篷',
+                                    desc: 'Fabric-shell Vehicle Side Awning',
+                                    price: 118.8,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao15',
+                                    name: '车载水箱',
+                                    desc: 'Vehicle Water Tank',
+                                    price: 162.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao16',
+                                    name: '两阶梯',
+                                    desc: 'Two-step ladder',
+                                    price: 31.5,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao17',
+                                    name: '柴油暖风机',
+                                    desc: 'Diesel heater',
+                                    price: 180.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao18',
+                                    name: '可调车轮轮胎踏板（单件）',
+                                    desc: 'Adjustable Wheel Tire Step (single unit)',
+                                    price: 39.6,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao19',
+                                    name: '便携空调',
+                                    desc: 'Portable Air Conditioner',
+                                    price: 378.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao20',
+                                    name: '便携户外即热式热水器',
+                                    desc: 'Portable Outdoor  Tankless Water Heater',
+                                    price: 540.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao21',
+                                    name: '便携电源',
+                                    desc: 'Portable Power Station',
+                                    price: 573.3,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao22',
+                                    name: '淋浴帐篷',
+                                    desc: 'Shower tent',
+                                    price: 135.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'hao23',
+                                    name: '帐篷长边两个外悬窗',
+                                    desc: 'Two Overhanging Windows for Long Sides of Tent',
+                                    price: 270.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 'full',
+                    name: '全箱',
+                    price: 8148.0,
+                    image: 'https://aka.doubaocdn.com/s/d8nT1wgX1k',
+                    desc: '全尺寸皮卡露营车，空间更大配置更全。整车焊接结构、航空铝板外壳、XPS保温层，适合长途穿越与深度户外探险。',
+                    groups: [
+                        {
+                            id: 'full_standard',
+                            name: '标准配置',
+                            type: 'standard',
+                            desc: '以下项目已包含在基础价格中，无需额外付费',
+                            items: [
+                                {
+                                    id: 'fs1',
+                                    name: '升降系统',
+                                    desc: 'Manual lift with 4 hydraulic rods and 4 scissor braces.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs2',
+                                    name: '车身结构',
+                                    desc: '②尾部两个大铝制工具箱带洞洞板（多功能空间利用） ③双侧洞洞板（方便外挂件安装） Fully welded body: outer shell uses 5-series aerospace 2 mm aluminum plate, with internal aluminum square-tube reinforcement for lower weight and longer life. Two rear large aluminum tool boxes with pegboards for multifunctional storage. Pegboards on both sides for external accessory mounting.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs3',
+                                    name: '箱体保温',
+                                    desc: 'Middle layer uses high-density XPS flame-retardant eco insulation board.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs4',
+                                    name: '门',
+                                    desc: 'All-aluminum rear camper door with dedicated rear-door window, insect mesh, and privacy sunshade.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs5',
+                                    name: '全铝地板',
+                                    desc: 'All-aluminum alloy floor with carbon-fiber-look lower surface finish.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs6',
+                                    name: '额头床',
+                                    desc: 'Full-size cabover bed, pull-out or foldable. Size: 2000 mm L x 1450 mm W, adjusted by vehicle model. Includes 30-50 mm mattress.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs7',
+                                    name: '内饰',
+                                    desc: 'Lightweight PET eco interior wall panels.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs8',
+                                    name: '外放电',
+                                    desc: 'Outdoor power box with 220 V sockets and two USB ports, plus waterproof external power box.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs9',
+                                    name: '柴暧',
+                                    desc: '5 kW variable-frequency diesel heater with high-altitude module.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs10',
+                                    name: '水箱标配',
+                                    desc: '③水位显示器 ④食品级水管路系统 ⑤重力加水口 70 L RV food-grade water tank, RV silent diaphragm pump, water-level display, food-grade water piping, and gravity water inlet.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs11',
+                                    name: '不锈钢洗漱池',
+                                    desc: 'Stainless steel sink with folding faucet and hot/cold mixing valve.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs12',
+                                    name: '安全报警器',
+                                    desc: 'Carbon monoxide detector alarm with installation.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs13',
+                                    name: '灭火器',
+                                    desc: 'Water-based fire extinguisher x1 with bracket installation.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs14',
+                                    name: '脱困版',
+                                    desc: 'Off-road recovery board and mounting device x1.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs15',
+                                    name: '人字梯',
+                                    desc: 'Two-step ladder, foldable and mountable on rear box.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs16',
+                                    name: '固定',
+                                    desc: 'Tensioning fixing devices x4.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs17',
+                                    name: '配件',
+                                    desc: 'Hardware, sealing, insulation, decorative accessories, etc.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs18',
+                                    name: '控制系统及线路',
+                                    desc: 'Switches, cables, fuses, and related accessories.',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'fs19',
+                                    name: '颜色',
+                                    desc: 'Matte black / matte dark gray / matte light gray.',
+                                    price: 0,
+                                    isDefault: true
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_1',
+                            name: '升顶帐篷',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择升顶帐篷配置',
+                            items: [
+                                {
+                                    id: 'full_1_1',
+                                    name: '帐篷窗户4层结构：双层保温棉帘、防水防霉透气帐篷布、透明防雨帘、防蚊虫纱网',
+                                    desc: '升顶高度90cm（大部分车型满足） Tent window has 4-layer structure: double insulated cotton curtain, waterproof mildew-resistant breathable tent fabric, transparent rain curtain, and insect mesh. Pop-up height 90 cm, suitable for most vehicles.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_1_2',
+                                    name: '升级电动升顶系统（前后叉形升顶）',
+                                    desc: 'Upgrade to electric pop-up roof system with front/rear scissor lift.',
+                                    price: 1111.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_2',
+                            name: '窗',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择窗配置',
+                            items: [
+                                {
+                                    id: 'full_2_1',
+                                    name: '房车专用双层亚克力窗+隐私帘、纱窗*2',
+                                    desc: 'RV-specific double-layer acrylic windows with privacy curtains and insect screens x2.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_2_2',
+                                    name: '箱内前通风窗 600*300',
+                                    desc: 'Front ventilation window inside camper, 600 x 300.',
+                                    price: 185.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_3',
+                            name: '桌子',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择桌子配置',
+                            items: [
+                                {
+                                    id: 'full_3_1',
+                                    name: '房车专用折叠桌',
+                                    desc: 'RV-specific folding table.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_3_2',
+                                    name: '手摇式升降桌+沙发垫（可变60-80cm宽降下可铺床），长度按车型设计）',
+                                    desc: 'Manual lift table with sofa cushion; lowers into a 60-80 cm bed, length designed by vehicle model.',
+                                    price: 165.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_3_3',
+                                    name: '电动式升降桌+沙发垫（60-80cm宽降下可铺床），长度按车型设计）',
+                                    desc: 'Electric lift table with sofa cushion; lowers into a 60-80 cm bed, length designed by vehicle model.',
+                                    price: 226.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_4',
+                            name: '全铝家具',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择全铝家具配置',
+                            items: [
+                                {
+                                    id: 'full_4_1',
+                                    name: '全铝对坐沙发+50D沙发垫（木制台面）',
+                                    desc: '全铝储物柜（木制台面） All-aluminum face-to-face sofa with 50D sofa cushions and wood tabletop. All-aluminum storage cabinet with wood tabletop.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_4_2',
+                                    name: '升级全铝家具软包材质',
+                                    desc: 'Upgrade all-aluminum furniture with upholstered material.',
+                                    price: 617.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_5',
+                            name: '电源',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择电源配置',
+                            items: [
+                                {
+                                    id: 'full_5_1',
+                                    name: '100AH 胶体电池',
+                                    desc: '2000W 纯正弦波逆变器 100 Ah gel battery. 2000 W pure sine wave inverter.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_5_2',
+                                    name: '行车充电、双电瓶隔离器、25平方电线前车接线到房箱+300A保险盒+继电器+控制器+保险盒',
+                                    desc: 'Driving charging system, dual-battery isolator, 25 sq mm cable from vehicle to camper, 300 A fuse box, relay, controller, and fuse box.',
+                                    price: 309.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_5_3',
+                                    name: '升级3000W纯正弦波逆变器（标值功率非峰值功率），包括安装220V插座+空开+外接逆变器显示屏。',
+                                    desc: 'Upgrade to 3000 W pure sine wave inverter, rated power not peak power; includes 220 V socket, breaker, and external inverter display.',
+                                    price: 185.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_5_4',
+                                    name: '升级200AH磷酸铁锂电池（带中国人民保险）+库仑计',
+                                    desc: 'Upgrade to 200 Ah LiFePO4 battery with PICC insurance and coulomb meter.',
+                                    price: 576.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_5_5',
+                                    name: '升级540AH磷酸铁锂电池（带中国人民保险）+库仑计',
+                                    desc: 'Upgrade to 540 Ah LiFePO4 battery with PICC insurance and coulomb meter.',
+                                    price: 1556.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_5_6',
+                                    name: '升级600AH磷酸铁锂电池（带中国人民保险）+库仑计',
+                                    desc: 'Upgrade to 600 Ah LiFePO4 battery with PICC insurance and coulomb meter.',
+                                    price: 1728.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_5_7',
+                                    name: '颐尔福12V节能变频空调（分体式）+人工+辅材',
+                                    desc: 'Yierfu 12 V energy-saving split inverter air conditioner, labor, and auxiliary materials.',
+                                    price: 741.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_6',
+                            name: '太阳能充电',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择太阳能充电配置',
+                            items: [
+                                {
+                                    id: 'full_6_1',
+                                    name: '200W柔性太阳能板（含智能MPPT太阳能控制器）',
+                                    desc: '200 W flexible solar panel with smart MPPT solar controller.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_6_2',
+                                    name: '400W柔性太阳能板（含智能MPPT太阳能控制器）',
+                                    desc: '400 W flexible solar panel with smart MPPT solar controller.',
+                                    price: 247.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_6_3',
+                                    name: '600W柔性太阳能板（含智能MPPT太阳能控制器）',
+                                    desc: '600 W flexible solar panel with smart MPPT solar controller.',
+                                    price: 494.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_7',
+                            name: '室内用电',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择室内用电配置',
+                            items: [
+                                {
+                                    id: 'full_7_1',
+                                    name: '220V＋USB插座*2',
+                                    desc: '床头220V＋USB用电插座*1 220 V + USB outlets x2. Bedside 220 V + USB outlet x1.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_7_2',
+                                    name: '增加220V+USB充电接口（每套价格）',
+                                    desc: 'Additional 220 V + USB charging outlet, price per set.',
+                                    price: 31.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_8',
+                            name: '照明',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择照明配置',
+                            items: [
+                                {
+                                    id: 'full_8_1',
+                                    name: 'LED室内照明灯*2、室内氛围灯带*2',
+                                    desc: '外部照明灯*2、示宽灯（带遥控）*4 Interior LED lights x2 and ambient light strips x2. Exterior lights x2 and remote-controlled marker lights x4.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_8_2',
+                                    name: '5寸探照灯4个+遥控开关',
+                                    desc: '5-inch search lights x4 with remote switch.',
+                                    price: 247.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'full_8_3',
+                                    name: '高位刹车灯',
+                                    desc: 'High-mounted brake light.',
+                                    price: 62.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_9',
+                            name: '户外淋浴头',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择户外淋浴头配置',
+                            items: [
+                                {
+                                    id: 'full_9_1',
+                                    name: '户外淋浴花洒+双阀门（带冷热混水阀）',
+                                    desc: 'Outdoor shower head with dual valves and hot/cold mixing valve.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_9_2',
+                                    name: '车边淋浴帐篷（外挂）铝壳',
+                                    desc: 'Vehicle-side external shower tent with aluminum shell.',
+                                    price: 267.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_10',
+                            name: '房箱支腿',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择房箱支腿配置',
+                            items: [
+                                {
+                                    id: 'full_10_1',
+                                    name: '手摇式支腿4个含配件（用于拆装房箱）',
+                                    desc: 'Manual crank support legs x4 with accessories for camper installation/removal.',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full_10_2',
+                                    name: '升级房箱专用电动支腿',
+                                    desc: 'Upgrade to camper-specific electric support legs.',
+                                    price: 1440.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_11',
+                            name: '侧扩展',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选侧扩展升级',
+                            items: [
+                                {
+                                    id: 'full_11_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_11_2',
+                                    name: '单侧直推式扩展系统（含遮雨帘）',
+                                    desc: 'Single-side straight-push expansion system with rain awning.',
+                                    price: 514.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_12',
+                            name: '侧扩展',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选侧扩展升级',
+                            items: [
+                                {
+                                    id: 'full_12_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_12_2',
+                                    name: '双侧直推式扩展系统（含遮雨帘）',
+                                    desc: 'Dual-side straight-push expansion system with rain awning.',
+                                    price: 1029.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_13',
+                            name: '270°遮阳篷',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选270°遮阳篷升级',
+                            items: [
+                                {
+                                    id: 'full_13_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_13_2',
+                                    name: '270度手动转向天幕：2.5米+角码固定+带灯+开关控制',
+                                    desc: '270-degree manual rotating awning: 2.5 m, angle-bracket mounting, with light and switch control.',
+                                    price: 535.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_14',
+                            name: '270°遮阳篷',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选270°遮阳篷升级',
+                            items: [
+                                {
+                                    id: 'full_14_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_14_2',
+                                    name: '270度手动转向天幕 2.2米 铝壳',
+                                    desc: '270-degree manual rotating awning, 2.2 m, aluminum shell.',
+                                    price: 741.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_15',
+                            name: '冰箱',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选冰箱升级',
+                            items: [
+                                {
+                                    id: 'full_15_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_15_2',
+                                    name: '15L升冰箱+12V插座+固定安装。',
+                                    desc: '15 L refrigerator with 12 V socket and fixed installation.',
+                                    price: 309.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_16',
+                            name: '冰箱',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选冰箱升级',
+                            items: [
+                                {
+                                    id: 'full_16_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_16_2',
+                                    name: '25L升冰箱+12V插座+固定安装。',
+                                    desc: '25 L refrigerator with 12 V socket and fixed installation.',
+                                    price: 350.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_17',
+                            name: '冰箱',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选冰箱升级',
+                            items: [
+                                {
+                                    id: 'full_17_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_17_2',
+                                    name: '30L升冰箱+12V插座+固定安装。',
+                                    desc: '30 L refrigerator with 12 V socket and fixed installation.',
+                                    price: 370.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_18',
+                            name: '柴油灶',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选柴油灶升级',
+                            items: [
+                                {
+                                    id: 'full_18_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_18_2',
+                                    name: '抽拉厨房（5KW柴油灶带台面+屏显）',
+                                    desc: 'Pull-out kitchen with 5 kW diesel stove, countertop, and display.',
+                                    price: 453.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_19',
+                            name: '电磁炉',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选电磁炉升级',
+                            items: [
+                                {
+                                    id: 'full_19_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_19_2',
+                                    name: '台面嵌入式900W电磁炉+插座',
+                                    desc: 'Countertop built-in 900 W induction cooktop with socket.',
+                                    price: 82.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_20',
+                            name: '室内淋浴',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选室内淋浴升级',
+                            items: [
+                                {
+                                    id: 'full_20_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_20_2',
+                                    name: '室内淋盒系统1套，抽拉水龙头+浴帘。',
+                                    desc: 'Indoor shower box system, pull-out faucet, and shower curtain.',
+                                    price: 412.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_21',
+                            name: '顶部通风',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选顶部通风升级',
+                            items: [
+                                {
+                                    id: 'full_21_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_21_2',
+                                    name: '房车专用车顶天窗',
+                                    desc: 'RV-specific roof hatch.',
+                                    price: 412.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_22',
+                            name: '顶部通风',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选顶部通风升级',
+                            items: [
+                                {
+                                    id: 'full_22_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_22_2',
+                                    name: '车顶带灯换气扇（带遥控开关）',
+                                    desc: 'Roof vent fan with light and remote switch.',
+                                    price: 185.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_23',
+                            name: '热水器',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选热水器升级',
+                            items: [
+                                {
+                                    id: 'full_23_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_23_2',
+                                    name: '220V / 7L电热水器+人工+辅材',
+                                    desc: '220 V / 7 L electric water heater, labor, and auxiliary materials.',
+                                    price: 206.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_24',
+                            name: '4路监控',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选4路监控升级',
+                            items: [
+                                {
+                                    id: 'full_24_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_24_2',
+                                    name: '房车专用四路监控系统',
+                                    desc: 'RV-specific four-channel monitoring system.',
+                                    price: 288.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_25',
+                            name: '兵工铲',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选兵工铲升级',
+                            items: [
+                                {
+                                    id: 'full_25_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_25_2',
+                                    name: '兵工铲+快拆固定支架',
+                                    desc: 'Entrenching shovel with quick-release mounting bracket.',
+                                    price: 82.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full_26',
+                            name: '油桶',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '可选油桶升级',
+                            items: [
+                                {
+                                    id: 'full_26_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full_26_2',
+                                    name: '5L外挂油箱+锁扣',
+                                    desc: '5 L external fuel tank with lock buckle.',
+                                    price: 103.0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 'full2',
+                    name: '全箱Pro',
+                    price: 10592.4,
+                    image: 'https://aka.doubaocdn.com/s/d8nT1wgX1k',
+                    desc: '旗舰级全尺寸皮卡露营车，在全箱基础上全面升级配置。更高规格的电力系统、更完善的生活设施，为深度户外爱好者打造的移动家园。',
+                    groups: [
+                        {
+                            id: 'full2_standard',
+                            name: '标准配置',
+                            type: 'standard',
+                            desc: '以下项目已包含在基础价格中，无需额外付费',
+                            items: [
+                                {
+                                    id: 'f2s1',
+                                    name: '轻量化手动升降系统',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s2',
+                                    name: '车身材质Body material',
+                                    desc: 'aluminum',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s3',
+                                    name: '户外专用篷布Outdoor tarp',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s4',
+                                    name: '升顶开窗*4Ceiling opening *4',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s5',
+                                    name: '外推窗Extrapolated window',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s6',
+                                    name: '抽拉式拓展仓',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s7',
+                                    name: '轻量化房车门Lightweight RV door',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s8',
+                                    name: '超轻防水地板革',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s9',
+                                    name: '抽拉式额头床Pull out forehead bed',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s10',
+                                    name: '淋浴间+移动马桶',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s11',
+                                    name: '随车音响On-board audio system',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s12',
+                                    name: '室内淋浴系统',
+                                    desc: `
+Electric lifting outriggers`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s13',
+                                    name: '便携式马桶/固定马桶',
+                                    desc: `
+200w solar energy`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s14',
+                                    name: '车尾柴油抽拉灶具（可选燃气/柴油）',
+                                    desc: `
+Battery power/milliampere`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s15',
+                                    name: '电动升降杆升顶/',
+                                    desc: `
+Folding hanging ladder`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s16',
+                                    name: '液晶控制面板+监控系统',
+                                    desc: `
+Top-mounted skylight with light source`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s17',
+                                    name: '前观察窗Front opening window',
+                                    desc: `
+On-board audio system`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s18',
+                                    name: '电动遮阳棚Electric sunshade',
+                                    desc: `
+Bicycle frame`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s19',
+                                    name: '增加拓展仓',
+                                    desc: `
+3000W-inverter`,
+                                    price: 0,
+                                    isDefault: true
+                                },
+                                {
+                                    id: 'f2s20',
+                                    name: '围挡小房子必须搭配',
+                                    desc: `
+Tarpaulin window`,
+                                    price: 0,
+                                    isDefault: true
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_1',
+                            name: '坐垫及床垫Cushions and mattresses',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择坐垫及床垫Cushions and mattresses配置',
+                            items: [
+                                {
+                                    id: 'full2_1_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_1_2',
+                                    name: '标准配置',
+                                    desc: `
+50D sponge cotton and linen soft pad`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_2',
+                            name: '定制家具Custom furniture',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择定制家具Custom furniture配置',
+                            items: [
+                                {
+                                    id: 'full2_2_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_2_2',
+                                    name: '标准配置',
+                                    desc: `
+轻质板
+Eo-level environmental protection
+Lightweight board`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_3',
+                            name: '升降/折叠餐桌Lifting/folding dining table',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择升降/折叠餐桌Lifting/folding dining table配置',
+                            items: [
+                                {
+                                    id: 'full2_3_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_3_2',
+                                    name: '标准配置',
+                                    desc: '升降/折叠餐桌Lifting/folding dining table',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_4',
+                            name: '对向卡座（可变床）Opposite cassette',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择对向卡座（可变床）Opposite cassette配置',
+                            items: [
+                                {
+                                    id: 'full2_4_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_4_2',
+                                    name: '标准配置',
+                                    desc: '对向卡座（可变床）Opposite cassette',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_5',
+                            name: '电池battery',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择电池battery配置',
+                            items: [
+                                {
+                                    id: 'full2_5_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_5_2',
+                                    name: '标准配置',
+                                    desc: `
+Lead-acid battery`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full2_5_3',
+                                    name: '高配版',
+                                    desc: `
+Lithium iron phosphate battery`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_6',
+                            name: '控制面板',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择控制面板配置',
+                            items: [
+                                {
+                                    id: 'full2_6_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_6_2',
+                                    name: '标准配置',
+                                    desc: '控制面板',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_7',
+                            name: '市电充电套装',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择市电充电套装配置',
+                            items: [
+                                {
+                                    id: 'full2_7_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_7_2',
+                                    name: '标准配置',
+                                    desc: '市电充电套装',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_8',
+                            name: '太阳能+MPPT控制器Solar +MPPT controller',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择太阳能+MPPT控制器Solar +MPPT controller配置',
+                            items: [
+                                {
+                                    id: 'full2_8_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_8_2',
+                                    name: '标准配置',
+                                    desc: `
+30AMPPT controller`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full2_8_3',
+                                    name: '高配版',
+                                    desc: `
+60AMPPT controller`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_9',
+                            name: '定制水箱Custom water tank',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择定制水箱Custom water tank配置',
+                            items: [
+                                {
+                                    id: 'full2_9_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_9_2',
+                                    name: '标准配置',
+                                    desc: '20L',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full2_9_3',
+                                    name: '高配版',
+                                    desc: '80L',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_10',
+                            name: '食品级水路Food grade waterway',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择食品级水路Food grade waterway配置',
+                            items: [
+                                {
+                                    id: 'full2_10_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_10_2',
+                                    name: '标准配置',
+                                    desc: '食品级水路Food grade waterway',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_11',
+                            name: '室内折叠水龙头Indoor folding faucet',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择室内折叠水龙头Indoor folding faucet配置',
+                            items: [
+                                {
+                                    id: 'full2_11_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_11_2',
+                                    name: '标准配置',
+                                    desc: 'Single cooling',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full2_11_3',
+                                    name: '高配版',
+                                    desc: 'Cold and hot',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_12',
+                            name: '食品级不锈钢水槽Food grade stainless steel sink',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择食品级不锈钢水槽Food grade stainless steel sink配置',
+                            items: [
+                                {
+                                    id: 'full2_12_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_12_2',
+                                    name: '标准配置',
+                                    desc: `
+Cover plate type`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                },
+                                {
+                                    id: 'full2_12_3',
+                                    name: '高配版',
+                                    desc: `
+Folding version`,
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_13',
+                            name: '室外淋浴系统Outdoor shower system',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择室外淋浴系统Outdoor shower system配置',
+                            items: [
+                                {
+                                    id: 'full2_13_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_13_2',
+                                    name: '标准配置',
+                                    desc: '室外淋浴系统Outdoor shower system',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_14',
+                            name: '水位表Water level gauge',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择水位表Water level gauge配置',
+                            items: [
+                                {
+                                    id: 'full2_14_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_14_2',
+                                    name: '标准配置',
+                                    desc: '水位表Water level gauge',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_15',
+                            name: '房车专用水泵Rv special water pump',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择房车专用水泵Rv special water pump配置',
+                            items: [
+                                {
+                                    id: 'full2_15_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_15_2',
+                                    name: '标准配置',
+                                    desc: '房车专用水泵Rv special water pump',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_16',
+                            name: '重力加水口Gravity feed port',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择重力加水口Gravity feed port配置',
+                            items: [
+                                {
+                                    id: 'full2_16_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_16_2',
+                                    name: '标准配置',
+                                    desc: '重力加水口Gravity feed port',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_17',
+                            name: '室外灯Outdoor light',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择室外灯Outdoor light配置',
+                            items: [
+                                {
+                                    id: 'full2_17_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_17_2',
+                                    name: '标准配置',
+                                    desc: '室外灯Outdoor light',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_18',
+                            name: '室内氛围灯Indoor ambient light',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择室内氛围灯Indoor ambient light配置',
+                            items: [
+                                {
+                                    id: 'full2_18_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_18_2',
+                                    name: '标准配置',
+                                    desc: '室内氛围灯Indoor ambient light',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_19',
+                            name: '双向换气扇',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择双向换气扇配置',
+                            items: [
+                                {
+                                    id: 'full2_19_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_19_2',
+                                    name: '标准配置',
+                                    desc: '双向换气扇',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_20',
+                            name: '快拆升降支腿Remove the leg now',
+                            type: 'upgrade',
+                            isSingle: true,
+                            desc: '选择快拆升降支腿Remove the leg now配置',
+                            items: [
+                                {
+                                    id: 'full2_20_1',
+                                    name: '不选配',
+                                    desc: '不添加此配置',
+                                    price: 0,
+                                    isDefault: true,
+                                    icon: '❌'
+                                },
+                                {
+                                    id: 'full2_20_2',
+                                    name: '标准配置',
+                                    desc: '快拆升降支腿Remove the leg now',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '✅'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_addons',
+                            name: '可选配件',
+                            type: 'addon',
+                            isSingle: false,
+                            desc: '按需加配，打造专属户外装备',
+                            items: [
+                                {
+                                    id: 'f2a1',
+                                    name: '逆变器inverter',
+                                    desc: '2000w',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a2',
+                                    name: '行车充电In-service charging',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a3',
+                                    name: '5KW柴油暖气',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a4',
+                                    name: '燃气热水器Gas water heater',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a5',
+                                    name: '分体式壁挂空调',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a6',
+                                    name: '25L车载冰箱',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a7',
+                                    name: '脱困板及固定器Escape plate and fixator',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a8',
+                                    name: '工兵铲及固定器Engineer shovel and fixer',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a9',
+                                    name: '挂件轨道Pendant track',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a10',
+                                    name: '车尾书包Backbook bag',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a11',
+                                    name: '柴油油桶Diesel oil drum',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a12',
+                                    name: '遮阳棚Sunshade shed',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                },
+                                {
+                                    id: 'f2a13',
+                                    name: '全铝外壳淋浴帐篷',
+                                    desc: '',
+                                    price: 0,
+                                    isDefault: false,
+                                    icon: '⭐'
+                                }
+                            ]
+                        },
+                        {
+                            id: 'full2_optional',
+                            name: '可选装配置',
+                            type: 'addon',
+                            isSingle: false,
+                            desc: '更多升级选项，按需选配',
+                            items: [
+                                {
+                                    id: 'f2opt1',
+                                    name: '室内淋浴系统',
+                                    desc: '下水系统+洗手盆+浴帘+滑道+花洒',
+                                    price: 1114.29,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt2',
+                                    name: '便携式马桶/固定马桶',
+                                    desc: 'Portable toilet/Fixed toilet',
+                                    price: 111.43,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt3',
+                                    name: '车尾柴油抽拉灶具（可选燃气/柴油）',
+                                    desc: 'Tail-diesel pull-out stove(Optional gas/diesel)',
+                                    price: 148.57,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt4',
+                                    name: '电动升降杆升顶/',
+                                    desc: '电动剪刀支撑升顶',
+                                    price: 650.0,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt5',
+                                    name: '液晶控制面板+监控系统',
+                                    desc: 'Liquid crystal touch control panel + monitoring system',
+                                    price: 278.57,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt6',
+                                    name: '前观察窗Front opening window',
+                                    desc: '',
+                                    price: 278.57,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt7',
+                                    name: '电动遮阳棚Electric sunshade',
+                                    desc: '',
+                                    price: 27.86,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt8',
+                                    name: '增加拓展仓',
+                                    desc: 'Add an extra expansion bin',
+                                    price: 55.71,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                },
+                                {
+                                    id: 'f2opt9',
+                                    name: '围挡小房子必须搭配',
+                                    desc: '270帐篷安装Fencing the small house (must be matched.',
+                                    price: 278.57,
+                                    isDefault: false,
+                                    icon: '🔧'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let configData = {};
+        let currentProduct = null;
+        let selectedOptions = {};
+        let selectedAddons = {};
+
+        // 初始化
+        function init() {
+            loadConfigData();
+            loadContactInfo();
+            renderProductSelector();
+        }
+
+        // 加载配置数据
+        function loadConfigData() {
+            const saved = localStorage.getItem('freeman_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.configurator && data.configurator.products && data.configurator.products.length > 0) {
+                        const products = data.configurator.products.map(function(p) {
+                            if (!p.groups) p.groups = [];
+                            p.groups.forEach(function(g) {
+                                if (g.type === 'upgrade') {
+                                    g.isSingle = true;
+                                } else if (g.type === 'addon') {
+                                    g.isSingle = false;
+                                }
+                            });
+                            return p;
+                        });
+                        configData = {
+                            configProducts: products
+                        };
+                        return;
+                    }
+                    if (data.configGroups && data.configGroups.length > 0 && data.configProducts && data.configProducts.length > 0) {
+                        configData = {
+                            configProducts: data.configProducts.map(function(p) {
+                                return {
+                                    ...p,
+                                    groups: p.groupIds.map(function(gid) {
+                                        return data.configGroups.find(function(g) { return g.id === gid; });
+                                    }).filter(function(g) { return g; })
+                                };
+                            })
+                        };
+                        return;
+                    }
+                } catch (e) {}
+            }
+            configData = defaultConfiguratorData;
+        }
+
+        // 加载联系信息
+        function loadContactInfo() {
+            const saved = localStorage.getItem('freeman_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.config) {
+                        if (data.config.phone) {
+                            document.getElementById('footerPhone').textContent = '📞 ' + data.config.phone;
+                        }
+                        if (data.config.email) {
+                            document.getElementById('footerEmail').textContent = '✉️ ' + data.config.email;
+                        }
+                        if (data.config.address) {
+                            document.getElementById('footerAddress').textContent = '📍 ' + data.config.address;
+                        }
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // 渲染产品选择器
+        function renderProductSelector() {
+            const container = document.getElementById('productSelector');
+            container.innerHTML = configData.configProducts.map(function(p) {
+                return '<div class="product-card" onclick="selectProduct(\'' + p.id + '\')">' +
+                    '<div class="product-card-images">' +
+                    '<img src="' + p.image + '" alt="' + p.name + '">' +
+                    '<div class="product-price-badge">基础价格: ' + formatPrice(p.price) + '</div>' +
+                    '</div>' +
+                    '<div class="product-card-info">' +
+                    '<h3>' + p.name + '</h3>' +
+                    '<p>' + p.desc + '</p>' +
+                    '<div class="product-price">' +
+                    '<span class="label">基础价格</span>' +
+                    '<span class="value">' + formatPrice(p.price) + '</span>' +
+                    '</div>' +
+                    '<button class="start-config-btn">开始配置 <span>→</span></button>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // 选择产品
+        function selectProduct(productId) {
+            const product = configData.configProducts.find(function(p) { return p.id === productId; });
+            if (!product) return;
+
+            currentProduct = product;
+            
+            // 初始化选中的选项
+            selectedOptions = {};
+            selectedAddons = {};
+
+            // 获取该产品关联的分组
+            const groups = product.groups || [];
+
+            groups.forEach(function(group) {
+                if (group.type === 'standard') {
+                    selectedAddons[group.id] = group.items.filter(function(item) { return item.isDefault; });
+                } else if (group.isSingle) {
+                    const defaultItem = group.items.find(function(item) { return item.isDefault; });
+                    if (defaultItem) {
+                        selectedOptions[group.id] = defaultItem;
+                    }
+                } else {
+                    selectedAddons[group.id] = [];
+                }
+            });
+
+            document.getElementById('productSelectView').classList.add('hidden');
+            document.getElementById('configDetailView').classList.add('active');
+            document.getElementById('configSidebar').classList.add('visible');
+            document.querySelector('.page-header').style.display = 'none';
+            document.getElementById('currentProductName').textContent = product.name;
+            document.getElementById('currentProductDesc').textContent = product.desc;
+            // 填充产品图片
+            document.getElementById('galleryImg1').src = product.image;
+            document.getElementById('detailBasePrice').textContent = formatPrice(product.price);
+            document.getElementById('sidebarProductName').textContent = product.name;
+            
+            renderConfigGroups();
+            updatePrice();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 渲染配置分组
+        function renderConfigGroups() {
+            const container = document.getElementById('configGroupsContainer');
+            let html = '';
+            let hasUpgradeTitle = false;
+            let hasAddonTitle = false;
+
+            const groups = currentProduct.groups || [];
+
+            groups.forEach(function(group) {
+                if (group.type === 'standard') {
+                    html += '<div class="standard-config">' +
+                        '<h3><span class="icon">✓</span> ' + group.name + ' — 已包含</h3>' +
+                        '<p class="subtitle">' + group.desc + '</p>' +
+                        '<div class="config-grid">';
+                    
+                    group.items.forEach(function(item) {
+                        html += '<div class="config-item">' +
+                            '<span class="check">✓</span>' +
+                            '<div class="info">' +
+                            '<h4>' + item.name + '</h4>' +
+                            '<p>' + item.desc + '</p>' +
+                            '<span class="tag">已包含</span>' +
+                            '</div>' +
+                            '</div>';
+                    });
+                    
+                    html += '</div></div>';
+                } else if (group.type === 'upgrade') {
+                    if (!hasUpgradeTitle) {
+                        html += '<h3 class="upgrade-title">' +
+                            '<span>↗</span> 升级选项</h3>' +
+                            '<p class="upgrade-subtitle">从标配升级到更高级的配置，仅需补差价</p>';
+                        hasUpgradeTitle = true;
+                    }
+                    html += '<div class="section" id="section-' + group.id + '">' +
+                        '<div class="section-header" onclick="toggleSection(\'section-' + group.id + '\')">' +
+                        '<div class="section-title">' +
+                        '<div>' +
+                        '<h3>' + group.name + '</h3>' +
+                        '<p>' + group.desc + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '<span class="section-toggle">⌄</span>' +
+                        '</div>' +
+                        '<div class="section-content">' +
+                        '<div class="options-grid">';
+                    
+                    group.items.forEach(function(item) {
+                        const isSelected = selectedOptions[group.id] && selectedOptions[group.id].id === item.id;
+                        let priceClass = '';
+                        let priceText = '';
+                        const icon = item.icon || '⬛';
+                        
+                        if (item.price === 0 && item.isDefault) {
+                            priceClass = 'included';
+                            priceText = '已包含';
+                        } else if (item.price === 0) {
+                            priceClass = 'free';
+                            priceText = '免费可选';
+                        } else {
+                            priceText = '+' + formatPrice(item.price);
+                        }
+                        
+                        html += '<div class="option-card' + (isSelected ? ' selected' : '') + '" onclick="selectSingleOption(\'' + group.id + '\', this, \'' + item.id + '\', ' + item.price + ', \'' + item.name.replace(/'/g, "\\'") + '\')">' +
+                            '<div class="option-card-header">' +
+                            '<div class="option-icon">' + icon + '</div>' +
+                            '<div class="option-info">' +
+                            '<h4>' + item.name + (item.isDefault ? ' <span class="badge">标配</span>' : '') + '</h4>' +
+                            '<p>' + item.desc + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '<span class="option-price ' + priceClass + '">' + priceText + '</span>' +
+                            '</div>';
+                    });
+                    
+                    html += '</div></div></div>';
+                } else if (group.type === 'addon') {
+                    if (!hasAddonTitle) {
+                        html += '<h3 class="addon-title">' +
+                            '<span>+</span> 可选配件</h3>' +
+                            '<p class="addon-subtitle">按需加配，打造专属户外装备</p>';
+                        hasAddonTitle = true;
+                    }
+                    html += '<div class="section" id="section-' + group.id + '">' +
+                        '<div class="section-header" onclick="toggleSection(\'section-' + group.id + '\')">' +
+                        '<div class="section-title">' +
+                        '<div>' +
+                        '<h3>' + group.name + '</h3>' +
+                        '<p>' + group.desc + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '<span class="section-toggle">⌄</span>' +
+                        '</div>' +
+                        '<div class="section-content">' +
+                        '<div class="options-grid">';
+                    
+                    group.items.forEach(function(item) {
+                        const isSelected = selectedAddons[group.id] && selectedAddons[group.id].some(function(i) { return i.id === item.id; });
+                        let priceText = '+' + formatPrice(item.price);
+                        const icon = item.icon || '🔧';
+                        
+                        html += '<div class="option-card multiple' + (isSelected ? ' selected' : '') + '" onclick="toggleAddonOption(\'' + group.id + '\', this, \'' + item.id + '\', ' + item.price + ', \'' + item.name.replace(/'/g, "\\'") + '\')">' +
+                            '<div class="option-card-header">' +
+                            '<div class="option-icon">' + icon + '</div>' +
+                            '<div class="option-info">' +
+                            '<h4>' + item.name + '</h4>' +
+                            '<p>' + item.desc + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '<span class="option-price">' + priceText + '</span>' +
+                            '</div>';
+                    });
+                    
+                    html += '</div></div></div>';
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        // 选择单选选项
+        function selectSingleOption(groupId, cardEl, itemId, price, itemName) {
+            const section = document.getElementById('section-' + groupId);
+            const cards = section.querySelectorAll('.option-card');
+            cards.forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            cardEl.classList.add('selected');
+
+            selectedOptions[groupId] = {
+                id: itemId,
+                name: itemName,
+                price: price
+            };
+
+            updatePrice();
+        }
+
+        // 切换多选选项
+        function toggleAddonOption(groupId, cardEl, itemId, price, itemName) {
+            cardEl.classList.toggle('selected');
+            const isSelected = cardEl.classList.contains('selected');
+
+            if (!selectedAddons[groupId]) {
+                selectedAddons[groupId] = [];
+            }
+
+            if (isSelected) {
+                selectedAddons[groupId].push({
+                    id: itemId,
+                    name: itemName,
+                    price: price
+                });
+            } else {
+                selectedAddons[groupId] = selectedAddons[groupId].filter(function(i) { return i.id !== itemId; });
+            }
+
+            updatePrice();
+        }
+
+        // 更新价格
+        function updatePrice() {
+            if (!currentProduct) return;
+
+            const basePrice = currentProduct.price;
+            let totalUpgrade = 0;
+            let upgradeHtml = '';
+
+            for (let key in selectedOptions) {
+                if (selectedOptions[key].price > 0) {
+                    totalUpgrade += selectedOptions[key].price;
+                    upgradeHtml += '<div class="price-item"><span>' + selectedOptions[key].name + '</span><span>+' + formatPrice(selectedOptions[key].price) + '</span></div>';
+                }
+            }
+
+            for (let key in selectedAddons) {
+                selectedAddons[key].forEach(function(item) {
+                    if (item.price > 0) {
+                        totalUpgrade += item.price;
+                        upgradeHtml += '<div class="price-item"><span>' + item.name + '</span><span>+' + formatPrice(item.price) + '</span></div>';
+                    }
+                });
+            }
+
+            document.getElementById('basePrice').textContent = formatPrice(basePrice);
+            document.getElementById('upgradeItems').innerHTML = upgradeHtml;
+            const total = basePrice + totalUpgrade;
+            document.getElementById('totalPrice').textContent = formatPrice(total);
+            // 同步更新详情页价格
+            const detailTotal = document.getElementById('detailTotalPrice');
+            if (detailTotal) {
+                detailTotal.textContent = formatPrice(total);
+            }
+        }
+
+        // 切换折叠面板
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('collapsed');
+        }
+
+        // 返回产品选择
+        function backToProductSelect() {
+            document.getElementById('productSelectView').classList.remove('hidden');
+            document.getElementById('configDetailView').classList.remove('active');
+            document.getElementById('configSidebar').classList.remove('visible');
+            document.querySelector('.page-header').style.display = 'block';
+            document.getElementById('pageTitle').textContent = '选择您的产品';
+            document.getElementById('pageSubtitle').textContent = '选择一款产品开始配置，打造您的专属户外露营装备。';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 生成报价单
+        function generateQuote() {
+            if (!currentProduct) return;
+
+            const basePrice = currentProduct.price;
+            let totalUpgrade = 0;
+            let upgradeItemsHtml = '';
+            let selectedConfigHtml = '';
+            let configData = {
+                product: {
+                    id: currentProduct.id,
+                    name: currentProduct.name,
+                    basePrice: basePrice
+                },
+                selectedOptions: {},
+                selectedAddons: {},
+                totalPrice: 0
+            };
+
+            for (let key in selectedOptions) {
+                const item = selectedOptions[key];
+                configData.selectedOptions[key] = item;
+                selectedConfigHtml += '<div class="quote-item"><span>' + getGroupName(key) + '</span><span>' + item.name + '</span></div>';
+                if (item.price > 0) {
+                    totalUpgrade += item.price;
+                    upgradeItemsHtml += '<div class="quote-item"><span>' + item.name + '</span><span>+' + formatPrice(item.price) + '</span></div>';
+                }
+            }
+
+            for (let key in selectedAddons) {
+                configData.selectedAddons[key] = selectedAddons[key];
+                selectedAddons[key].forEach(function(item) {
+                    selectedConfigHtml += '<div class="quote-item"><span>' + getGroupName(key) + '</span><span>' + item.name + '</span></div>';
+                    if (item.price > 0) {
+                        totalUpgrade += item.price;
+                        upgradeItemsHtml += '<div class="quote-item"><span>' + item.name + '</span><span>+' + formatPrice(item.price) + '</span></div>';
+                    }
+                });
+            }
+
+            const total = basePrice + totalUpgrade;
+            configData.totalPrice = total;
+            window.currentQuoteConfig = configData;
+
+            const content = '<div class="quote-section-title">产品信息</div>' +
+                '<div class="quote-item"><span>产品类型</span><span>' + currentProduct.name + '</span></div>' +
+                '<div class="quote-item"><span>基础价格</span><span>' + formatPrice(basePrice) + '</span></div>' +
+                '<div class="quote-section-title">已选配置</div>' +
+                selectedConfigHtml +
+                (upgradeItemsHtml ? '<div class="quote-section-title">升级项目</div>' + upgradeItemsHtml : '') +
+                '<div class="quote-item total"><span>总价</span><span>' + formatPrice(total) + '</span></div>';
+
+            document.getElementById('quoteContent').innerHTML = content;
+            // 清空表单
+            document.getElementById('quoteName').value = '';
+            document.getElementById('quotePhone').value = '';
+            document.getElementById('quoteEmail').value = '';
+            document.getElementById('quoteRemark').value = '';
+            document.getElementById('quoteModal').classList.add('show');
+        }
+
+        // 提交配置
+        async function submitQuote() {
+            const name = document.getElementById('quoteName').value.trim();
+            const phone = document.getElementById('quotePhone').value.trim();
+            const email = document.getElementById('quoteEmail').value.trim();
+            const remark = document.getElementById('quoteRemark').value.trim();
+            const btn = document.getElementById('submitQuoteBtn');
+
+            if (!name) {
+                alert('请输入您的姓名');
+                return;
+            }
+            if (!phone) {
+                alert('请输入联系电话');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '提交中...';
+
+            try {
+                const submitData = {
+                    id: Date.now(),
+                    submitTime: new Date().toISOString(),
+                    data: {
+                        ...window.currentQuoteConfig,
+                        contact: { name, phone, email, remark }
+                    }
+                };
+                
+                // 保存到 localStorage
+                let submissions = JSON.parse(localStorage.getItem('config_submissions') || '[]');
+                submissions.unshift(submitData);
+                localStorage.setItem('config_submissions', JSON.stringify(submissions));
+
+                // 把配置详情填到隐藏字段
+                const configDetails = JSON.stringify(window.currentQuoteConfig, null, 2);
+                document.getElementById('configDetailsInput').value = configDetails;
+
+                // 提交到 Netlify Forms
+                const form = document.getElementById('quoteForm');
+                const formData = new FormData(form);
+                
+                fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData).toString()
+                }).catch(function(err) {
+                    console.log('配置表单提交到 Netlify 失败（本地已保存）:', err);
+                });
+                
+                alert('配置提交成功！我们会尽快与您联系');
+                closeModal('quoteModal');
+            } catch (e) {
+                alert('提交失败：' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '提交配置获取报价';
+            }
+        }
+
+        function getGroupName(groupId) {
+            if (!currentProduct || !currentProduct.groups) return groupId;
+            const group = currentProduct.groups.find(function(g) { return g.id === groupId; });
+            return group ? group.name : groupId;
+        }
+
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('quoteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal('quoteModal');
+            }
+        });
+
+        // 初始化
+        init();
+    </script>
+    <script src="editable.js"></script>
+</body>
+</html>

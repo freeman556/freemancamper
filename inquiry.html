@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线询价 - FREE MAN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+            background: #ffffff;
+            line-height: 1.6;
+        }
+        .navbar {
+            background: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eee;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 14px;
+            border: 1px solid #eee;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #b3541e;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #fff;
+            padding: 60px 0;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .page-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .inquiry-section {
+            padding: 60px 0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        .inquiry-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+        }
+        .contact-info {
+            background: #fff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .contact-info h3 {
+            font-size: 20px;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+        .contact-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .contact-item .icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .contact-item .info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .contact-item .info p {
+            font-size: 14px;
+            color: #666;
+        }
+        .inquiry-form {
+            background: #fff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .inquiry-form h3 {
+            font-size: 20px;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group label .required {
+            color: #ff4d4f;
+            margin-left: 4px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #b3541e;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #b3541e;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background: #9a481a;
+        }
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .success-message.show {
+            display: block;
+        }
+        .success-message .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .success-message h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #52c41a;
+        }
+        .success-message p {
+            color: #666;
+            font-size: 14px;
+        }
+        .footer {
+            background: #1a1a1a;
+            color: #999;
+            padding: 60px 0 30px;
+            margin-top: 60px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-brand h3 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .footer-column h4 {
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column li {
+            margin-bottom: 12px;
+        }
+        .footer-column a {
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .footer-column a:hover {
+            color: #b3541e;
+        }
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        @media (max-width: 768px) {
+            .inquiry-container {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            .nav-menu {
+                gap: 16px;
+            }
+        }
+    </style>
+    <script src="site-data.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">FM</div>
+                <span>FREE MAN</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="products.html">产品</a></li>
+                <li><a href="configurator.html">配置器</a></li>
+                <li><a href="cases.html">案例</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="inquiry.html" class="active">询价</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>在线询价</h1>
+        <p>填写以下信息，我们将尽快与您联系</p>
+    </div>
+
+    <section class="inquiry-section">
+        <div class="inquiry-container">
+            <div class="contact-info">
+                <h3>联系方式</h3>
+                <div class="contact-item">
+                    <span class="icon">📞</span>
+                    <div class="info">
+                        <h4>客服热线</h4>
+                        <p>400-888-9999</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">✉️</span>
+                    <div class="info">
+                        <h4>电子邮箱</h4>
+                        <p>info@freemanoutdoor.com</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">📍</span>
+                    <div class="info">
+                        <h4>公司地址</h4>
+                        <p>中国浙江省杭州市余杭区户外装备产业园</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">⏰</span>
+                    <div class="info">
+                        <h4>工作时间</h4>
+                        <p>周一至周六 9:00 - 18:00</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">💬</span>
+                    <div class="info">
+                        <h4>微信咨询</h4>
+                        <p>扫描二维码添加客服微信</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inquiry-form">
+                <h3>填写询价信息</h3>
+                <form id="inquiryForm" name="inquiry" data-netlify="true" netlify-honeypot="bot-field">
+                    <input type="hidden" name="form-name" value="inquiry">
+                    <p class="hidden" style="display:none;">
+                        <label>Don't fill this out if you're human: <input name="bot-field"></label>
+                    </p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>您的姓名 <span class="required">*</span></label>
+                            <input type="text" name="name" required placeholder="请输入您的姓名">
+                        </div>
+                        <div class="form-group">
+                            <label>联系电话 <span class="required">*</span></label>
+                            <input type="tel" name="phone" required placeholder="请输入您的电话">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>电子邮箱</label>
+                        <input type="email" name="email" placeholder="请输入您的邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label>感兴趣的产品</label>
+                        <select name="product">
+                            <option value="">请选择产品</option>
+                            <option value="1">远征者 X1 皮卡背驼</option>
+                            <option value="2">自由者 S1 皮卡露营车</option>
+                            <option value="3">行者 T1 拖挂房车</option>
+                            <option value="4">轻旅 R1 升顶露营车</option>
+                            <option value="5">云顶 Rooftop 车顶帐篷</option>
+                            <option value="6">户外配件套装</option>
+                            <option value="other">其他/定制需求</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>所在地区</label>
+                        <input type="text" name="location" placeholder="请输入您所在的城市/地区">
+                    </div>
+                    <div class="form-group">
+                        <label>留言内容</label>
+                        <textarea name="message" placeholder="请描述您的需求或问题，我们将尽快为您解答..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">提交询价</button>
+                </form>
+                <div class="success-message" id="successMessage">
+                    <div class="icon">✅</div>
+                    <h3>提交成功！</h3>
+                    <p>感谢您的咨询，我们的客服人员将在24小时内与您联系。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>
+                    <div class="logo-icon" style="width: 32px; height: 32px; font-size: 12px;">FM</div>
+                    FREE MAN
+                </h3>
+                <p>专注户外皮卡露营装备研发与制造，为每一位冒险者提供可靠的移动家园。</p>
+            </div>
+            <div class="footer-column">
+                <h4>快速链接</h4>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="products.html">产品</a></li>
+                    <li><a href="configurator.html">配置器</a></li>
+                    <li><a href="cases.html">案例</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="inquiry.html">询价</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>产品分类</h4>
+                <ul>
+                    <li><a href="products.html?cat=1">皮卡背驼</a></li>
+                    <li><a href="products.html?cat=2">升顶露营车</a></li>
+                    <li><a href="products.html?cat=3">皮卡露营车</a></li>
+                    <li><a href="products.html?cat=4">拖挂房车</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>联系我们</h4>
+                <ul>
+                    <li id="footerAddress">📍 杭州余杭区户外装备产业园</li>
+                    <li id="footerPhone">📞 400-888-9999</li>
+                    <li id="footerEmail">✉️ info@freemanoutdoor.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 FREE MAN Outdoor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 获取后台数据
+        function getSiteData() {
+            try {
+                const saved = localStorage.getItem('freeman_data');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // 加载联系信息
+        function loadContactInfo() {
+            const data = getSiteData();
+            if (!data || !data.config) return;
+
+            if (data.config.phone && document.getElementById('footerPhone')) {
+                document.getElementById('footerPhone').textContent = '📞 ' + data.config.phone;
+            }
+            if (data.config.email && document.getElementById('footerEmail')) {
+                document.getElementById('footerEmail').textContent = '✉️ ' + data.config.email;
+            }
+            if (data.config.address && document.getElementById('footerAddress')) {
+                document.getElementById('footerAddress').textContent = '📍 ' + data.config.address;
+            }
+        }
+
+        document.getElementById('inquiryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach(function(value, key) {
+                data[key] = value;
+            });
+            data.createdAt = new Date().toISOString();
+            data.status = 'unread';
+            data.id = Date.now();
+
+            // 保存到 freeman_data（后台可以看到）
+            try {
+                let siteData = JSON.parse(localStorage.getItem('freeman_data') || '{}');
+                if (!siteData.inquiries) siteData.inquiries = [];
+                siteData.inquiries.push(data);
+                localStorage.setItem('freeman_data', JSON.stringify(siteData));
+            } catch(e) {}
+
+            // 同时也存到旧的位置（兼容）
+            const inquiries = JSON.parse(localStorage.getItem('freeman_inquiries') || '[]');
+            inquiries.push(data);
+            localStorage.setItem('freeman_inquiries', JSON.stringify(inquiries));
+
+            // 提交到 Netlify Forms（部署后可以在 Netlify 后台收到）
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            }).catch(function(err) {
+                // 提交失败也不影响用户体验，本地已经存了
+                console.log('表单提交到 Netlify 失败（本地已保存）:', err);
+            });
+
+            // 显示成功提示
+            document.getElementById('inquiryForm').style.display = 'none';
+            document.getElementById('successMessage').classList.add('show');
+        });
+
+        window.addEventListener('load', function() {
+            loadContactInfo();
+        });
+    </script>
+    <script src="editable.js"></script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户案例 - FREE MAN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+            background: #ffffff;
+            line-height: 1.6;
+        }
+        .navbar {
+            background: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eee;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 14px;
+            border: 1px solid #eee;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #b3541e;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #fff;
+            padding: 60px 0;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .page-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .cases-section {
+            padding: 60px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+        .case-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+        }
+        .case-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+        }
+        .case-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .case-info {
+            padding: 24px;
+        }
+        .case-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #fff5ee;
+            color: #b3541e;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .case-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .case-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .case-user {
+            display: flex;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .case-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+        }
+        .case-user-info .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .case-user-info .location {
+            font-size: 12px;
+            color: #999;
+        }
+        .footer {
+            background: #1a1a1a;
+            color: #999;
+            padding: 60px 0 30px;
+            margin-top: 60px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-brand h3 {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .footer-column h4 {
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column li {
+            margin-bottom: 12px;
+        }
+        .footer-column a {
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .footer-column a:hover {
+            color: #b3541e;
+        }
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        @media (max-width: 768px) {
+            .cases-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            .nav-menu {
+                gap: 16px;
+            }
+        }
+    </style>
+    <script src="site-data.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">FM</div>
+                <span>FREE MAN</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="products.html">产品</a></li>
+                <li><a href="configurator.html">配置器</a></li>
+                <li><a href="cases.html" class="active">案例</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="inquiry.html">询价</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>客户案例</h1>
+        <p>听听我们的客户怎么说</p>
+    </div>
+
+    <section class="cases-section">
+        <div class="cases-grid" id="casesGrid">
+            <!-- 案例列表将通过JavaScript动态渲染 -->
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>
+                    <div class="logo-icon" style="width: 32px; height: 32px; font-size: 12px;">FM</div>
+                    FREE MAN
+                </h3>
+                <p>专注户外皮卡露营装备研发与制造，为每一位冒险者提供可靠的移动家园。</p>
+            </div>
+            <div class="footer-column">
+                <h4>快速链接</h4>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="products.html">产品</a></li>
+                    <li><a href="configurator.html">配置器</a></li>
+                    <li><a href="cases.html">案例</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="inquiry.html">询价</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>产品分类</h4>
+                <ul>
+                    <li><a href="products.html?cat=1">皮卡背驼</a></li>
+                    <li><a href="products.html?cat=2">升顶露营车</a></li>
+                    <li><a href="products.html?cat=3">皮卡露营车</a></li>
+                    <li><a href="products.html?cat=4">拖挂房车</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>联系我们</h4>
+                <ul>
+                    <li id="footerAddress">📍 杭州余杭区户外装备产业园</li>
+                    <li id="footerPhone">📞 400-888-9999</li>
+                    <li id="footerEmail">✉️ info@freemanoutdoor.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 FREE MAN Outdoor. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        // 获取后台数据
+        function getSiteData() {
+            try {
+                const saved = localStorage.getItem('freeman_data');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // 加载联系信息
+        function loadContactInfo() {
+            const data = getSiteData();
+            if (!data || !data.config) return;
+
+            if (data.config.phone && document.getElementById('footerPhone')) {
+                document.getElementById('footerPhone').textContent = '📞 ' + data.config.phone;
+            }
+            if (data.config.email && document.getElementById('footerEmail')) {
+                document.getElementById('footerEmail').textContent = '✉️ ' + data.config.email;
+            }
+            if (data.config.address && document.getElementById('footerAddress')) {
+                document.getElementById('footerAddress').textContent = '📍 ' + data.config.address;
+            }
+        }
+
+        // 渲染案例列表
+        function renderCases() {
+            const data = getSiteData();
+            const grid = document.getElementById('casesGrid');
+            if (!grid) return;
+
+            let cases = [];
+            if (data && data.cases && data.cases.length > 0) {
+                cases = data.cases;
+            } else {
+                // 默认数据
+                cases = [
+                    { id: 1, title: '新疆自驾之旅', tag: '皮卡背驼', image: 'https://aka.doubaocdn.com/s/xDQy1wodQS', desc: '开着远征者X1穿越独库公路，从北疆到南疆，历时20天，行程8000公里。', user: '张先生', location: '山东 · 潍坊' },
+                    { id: 2, title: '家庭露营神器', tag: '拖挂房车', image: 'https://aka.doubaocdn.com/s/V27P1wodQR', desc: '一家四口的周末露营必备！行者T1空间大，有独立卫浴，孩子特别喜欢。', user: '李女士', location: '山东 · 青岛' },
+                    { id: 3, title: '越野穿越利器', tag: '皮卡露营车', image: 'https://aka.doubaocdn.com/s/dNRu1wodQQ', desc: '自由者S1兼顾了日常通勤和户外露营。升顶设计通过性好，四驱系统给力。', user: '王先生', location: '北京' }
+                ];
+            }
+
+            grid.innerHTML = cases.map(function(c) {
+                const avatarChar = c.user ? c.user.charAt(0) : '用';
+                return '<div class="case-card">' +
+                    '<img src="' + (c.image || '') + '" alt="' + (c.title || '') + '" class="case-image">' +
+                    '<div class="case-info">' +
+                        '<span class="case-tag">' + (c.tag || '') + '</span>' +
+                        '<h3 class="case-title">' + (c.title || '') + '</h3>' +
+                        '<p class="case-desc">' + (c.desc || '') + '</p>' +
+                        '<div class="case-user">' +
+                            '<div class="case-avatar">' + avatarChar + '</div>' +
+                            '<div class="case-user-info">' +
+                                '<div class="name">' + (c.user || '') + '</div>' +
+                                '<div class="location">' + (c.location || '') + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        window.addEventListener('load', function() {
+            loadContactInfo();
+            renderCases();
+        });
+    </script>
+    <script src="editable.js"></script>
+</body>
+</html>

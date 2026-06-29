@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="products.title">产品中心 - FREE MAN</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1a1a1a;
+            background: #fff;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .navbar {
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eee;
+        }
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1a1a;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: #1a1a1a;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+            border: none;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 36px;
+            align-items: center;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #1a1a1a;
+            font-size: 15px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: #b3541e;
+        }
+        .page-header {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%);
+        }
+        .page-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            position: relative;
+            letter-spacing: -0.5px;
+        }
+        .page-header p {
+            font-size: 18px;
+            opacity: 0.9;
+            position: relative;
+        }
+        .products-section {
+            padding: 80px 0;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 24px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            color: #666;
+        }
+        .filter-btn:hover {
+            border-color: #b3541e;
+            color: #b3541e;
+        }
+        .filter-btn.active {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 0;
+            overflow: hidden;
+            border: 1px solid #eee;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+            border-color: #ddd;
+        }
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+        .product-info {
+            padding: 28px 24px;
+        }
+        .product-category {
+            font-size: 12px;
+            color: #b3541e;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .product-name {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+        .product-desc {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-price {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+        .product-link {
+            color: #b3541e;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .footer {
+            background: #0a0a0a;
+            color: #888;
+            padding: 80px 0 40px;
+            margin-top: 80px;
+        }
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 60px;
+        }
+        .footer-brand h3 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .footer-column h4 {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column li {
+            margin-bottom: 14px;
+        }
+        .footer-column a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .footer-column a:hover {
+            color: #b3541e;
+        }
+        .footer-bottom {
+            border-top: 1px solid #222;
+            padding-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            .nav-menu {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">FM</div>
+                <span>FREE MAN</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" data-i18n="nav.home">首页</a></li>
+                <li><a href="products.html" class="active" data-i18n="nav.products">产品</a></li>
+                <li><a href="configurator.html" data-i18n="nav.configurator">配置器</a></li>
+                <li><a href="cases.html" data-i18n="nav.cases">案例</a></li>
+                <li><a href="faq.html" data-i18n="nav.faq">FAQ</a></li>
+                <li><a href="inquiry.html" data-i18n="nav.inquiry">询价</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1 data-i18n="products.title">产品中心</h1>
+        <p data-i18n="products.subtitle">六大产品系列，满足您的各种户外需求</p>
+    </div>
+
+    <section class="products-section">
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" onclick="filterProducts('all', this)" data-i18n="products.all">全部</button>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <!-- 产品列表将通过JavaScript动态渲染 -->
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>
+                    <div class="logo-icon" style="width: 32px; height: 32px; font-size: 12px;">FM</div>
+                    FREE MAN
+                </h3>
+                <p data-i18n="footer.brandDesc">专注户外皮卡露营装备研发与制造，为每一位冒险者提供可靠的移动家园。</p>
+            </div>
+            <div class="footer-column">
+                <h4 data-i18n="footer.quickLinks">快速链接</h4>
+                <ul>
+                    <li><a href="index.html" data-i18n="nav.home">首页</a></li>
+                    <li><a href="products.html" data-i18n="nav.products">产品</a></li>
+                    <li><a href="configurator.html" data-i18n="nav.configurator">配置器</a></li>
+                    <li><a href="cases.html" data-i18n="nav.cases">案例</a></li>
+                    <li><a href="faq.html" data-i18n="nav.faq">FAQ</a></li>
+                    <li><a href="inquiry.html" data-i18n="nav.inquiry">询价</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 data-i18n="footer.categories">产品分类</h4>
+                <ul>
+                    <li><a href="products.html?cat=1">皮卡背驼</a></li>
+                    <li><a href="products.html?cat=2">升顶露营车</a></li>
+                    <li><a href="products.html?cat=3">皮卡露营车</a></li>
+                    <li><a href="products.html?cat=4">拖挂房车</a></li>
+                    <li><a href="products.html?cat=5">车顶帐篷</a></li>
+                    <li><a href="products.html?cat=6">配件</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 data-i18n="footer.contactUs">联系我们</h4>
+                <ul>
+                    <li id="footerAddress">📍 杭州余杭区户外装备产业园</li>
+                    <li id="footerPhone">📞 400-888-9999</li>
+                    <li id="footerEmail">✉️ info@freemanoutdoor.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-i18n="footer.copyright">© 2026 FREE MAN Outdoor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="site-data.js"></script>
+    <script>
+        // 加载联系信息
+        function loadContactInfo() {
+            const data = getSiteData();
+            if (data && data.config) {
+                if (data.config.phone) {
+                    document.getElementById('footerPhone').textContent = '📞 ' + data.config.phone;
+                }
+                if (data.config.email) {
+                    document.getElementById('footerEmail').textContent = '✉️ ' + data.config.email;
+                }
+                if (data.config.address) {
+                    document.getElementById('footerAddress').textContent = '📍 ' + data.config.address;
+                }
+            }
+        }
+        loadContactInfo();
+    </script>
+
+    <script>
+        // 获取分类名称
+        function getCategoryName(id) {
+            const data = getSiteData();
+            if (data && data.categories) {
+                const cat = data.categories.find(function(c) { return c.id === id; });
+                if (cat) return cat.name;
+            }
+            return '';
+        }
+
+        // 渲染分类筛选按钮
+        function renderCategoryFilters() {
+            const data = getSiteData();
+            const filterBar = document.getElementById('filterBar');
+            if (!data || !data.categories || !filterBar) return;
+
+            // 保留"全部"按钮，添加其他分类按钮
+            data.categories.forEach(function(cat) {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.onclick = function() { filterProducts(cat.id, btn); };
+                btn.textContent = cat.name;
+                filterBar.appendChild(btn);
+            });
+        }
+
+        // 渲染产品列表
+        function renderProducts() {
+            const data = getSiteData();
+            const grid = document.getElementById('productsGrid');
+            if (!grid) return;
+
+            let products = [];
+            if (data && data.products && data.products.length > 0) {
+                products = data.products;
+            } else {
+                // 默认数据，防止没有数据时页面空白
+                products = [
+                    { id: 1, name: '远征者 X1 皮卡背驼', category: 1, price: '¥128,000', image: 'https://aka.doubaocdn.com/s/ocxD1wodQU', desc: '专为长途越野设计的皮卡背驼房箱，采用航空级铝合金框架，轻量化与强度兼备。' },
+                    { id: 2, name: '自由者 S1 皮卡露营车', category: 3, price: '¥168,000', image: 'https://aka.doubaocdn.com/s/dNRu1wodQQ', desc: '基于皮卡底盘打造的一体式露营车，兼顾日常通勤与户外露营。' },
+                    { id: 3, name: '行者 T1 拖挂房车', category: 4, price: '¥98,000', image: 'https://aka.doubaocdn.com/s/V27P1wodQR', desc: '轻量化拖挂房车，适合家庭长途旅行。独立卫浴、厨房、卧室一应俱全。' }
+                ];
+            }
+
+            grid.innerHTML = products.map(function(p) {
+                const catName = getCategoryName(p.category);
+                return '<a href="product-detail.html?id=' + p.id + '" class="product-card" data-category="' + p.category + '">' +
+                    '<img src="' + (p.image || '') + '" alt="' + (p.name || '') + '" class="product-image">' +
+                    '<div class="product-info">' +
+                        '<div class="product-category">' + (catName || '') + '</div>' +
+                        '<h3 class="product-name">' + (p.name || '') + '</h3>' +
+                        '<p class="product-desc">' + (p.desc || '') + '</p>' +
+                        '<div class="product-footer">' +
+                            '<span class="product-price">' + (p.price || '') + '</span>' +
+                            '<span class="product-link">了解更多 →</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</a>';
+            }).join('');
+        }
+
+        // 筛选产品
+        function filterProducts(category, btn) {
+            document.querySelectorAll('.filter-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
+
+            document.querySelectorAll('.product-card').forEach(function(card) {
+                if (category === 'all' || parseInt(card.dataset.category) === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        window.addEventListener('load', function() {
+            renderCategoryFilters();
+            renderProducts();
+
+            // URL参数筛选
+            const cat = getQueryParam('cat');
+            if (cat) {
+                setTimeout(function() {
+                    const btns = document.querySelectorAll('.filter-btn');
+                    btns.forEach(function(btn) {
+                        if (btn.textContent.includes(getCategoryName(parseInt(cat)))) {
+                            filterProducts(parseInt(cat), btn);
+                        }
+                    });
+                }, 100);
+            }
+        });
+    </script>
+    <script src="editable.js"></script>
+</body>
+</html>

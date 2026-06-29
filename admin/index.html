@@ -1805,21 +1805,70 @@
             };
         }
 
-        // ========== 通用图片上传处理 ==========
+        // ========== 图片压缩函数 ==========
+        function compressImage(file, maxWidth, maxHeight, quality) {
+            return new Promise(function(resolve, reject) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // 计算缩放比例
+                        if (width > maxWidth || height > maxHeight) {
+                            const ratio = Math.min(maxWidth / width, maxHeight / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // 压缩为base64
+                        const compressed = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressed);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 图片处理中标记
+        let isImageProcessing = false;
+
+        // ========== 通用图片上传处理（带压缩） ==========
         function handleImageUpload(event, previewId, inputId, removeBtnId) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(inputId).value = e.target.result;
-                    const preview = document.getElementById(previewId);
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
+                isImageProcessing = true;
+                // 显示上传中提示
+                const preview = document.getElementById(previewId);
+                preview.alt = '处理中...';
+                preview.style.display = 'block';
+                preview.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5OTkiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTIxIDEydjNhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDciPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDEyIDEyIiB0bz0iMzYwIDEyIDEyIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPjwvcGF0aD48L3N2Zz4=';
+                
+                // 压缩图片：最大600x600，质量0.6，确保体积小、处理快
+                compressImage(file, 600, 600, 0.6).then(function(compressedDataUrl) {
+                    document.getElementById(inputId).value = compressedDataUrl;
+                    preview.src = compressedDataUrl;
+                    preview.alt = '';
                     document.getElementById(removeBtnId).style.display = 'flex';
                     // 隐藏占位符
                     preview.parentElement.querySelector('.placeholder') && (preview.parentElement.querySelector('.placeholder').style.display = 'none');
-                };
-                reader.readAsDataURL(file);
+                    isImageProcessing = false;
+                }).catch(function(err) {
+                    alert('图片处理失败，请重试或选择更小的图片');
+                    console.error(err);
+                    preview.style.display = 'none';
+                    isImageProcessing = false;
+                });
             }
         }
 
@@ -1930,7 +1979,20 @@
 
         // 保存数据
         function saveData() {
-            localStorage.setItem('freeman_data', JSON.stringify(data));
+            if (isImageProcessing) {
+                alert('图片正在处理中，请稍等1-2秒再保存');
+                return false;
+            }
+            try {
+                const dataStr = JSON.stringify(data);
+                localStorage.setItem('freeman_data', dataStr);
+                console.log('数据已保存，大小：' + Math.round(dataStr.length / 1024) + 'KB');
+            } catch (e) {
+                alert('保存失败：存储空间不足！\n请删除一些不用的图片，或使用更小的图片（建议单张图片不超过300KB）');
+                console.error('保存失败', e);
+                return false;
+            }
+            return true;
         }
 
         // 获取存储的密码（默认 admin123）

@@ -1,6 +1,7 @@
 // 网站默认数据 - 部署后所有访问者都能看到的基础数据
 // 管理员可以在后台修改数据，修改后的数据保存在浏览器 localStorage 中
 // 如果需要让所有访问者看到修改后的内容，请导出数据并替换此文件后重新部署
+// 如果运行了 Node.js 服务器（server.js），数据会自动从服务器同步
 
 const SITE_DEFAULT_DATA = {
     config: {
@@ -54,6 +55,33 @@ const SITE_DEFAULT_DATA = {
     } catch (e) {
         console.warn('无法初始化网站数据', e);
     }
+
+    // 尝试从服务器同步最新数据（后台静默执行）
+    try {
+        fetch('/api/site-content', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('API不可用');
+        })
+        .then(function(result) {
+            if (result.success && result.data) {
+                // 保存服务器数据到 localStorage
+                localStorage.setItem('freeman_data', JSON.stringify(result.data));
+                console.log('已从服务器同步最新数据');
+            }
+        })
+        .catch(function(e) {
+            // 服务器不可用，使用本地数据，静默失败
+            console.log('服务器不可用，使用本地数据');
+        });
+    } catch (e) {
+        console.warn('同步服务器数据失败', e);
+    }
 })();
 
 // 获取网站数据 - 从 localStorage 读取
@@ -78,4 +106,33 @@ function saveSiteData(data) {
         console.error('保存数据失败', e);
         return false;
     }
+}
+
+// 从服务器刷新数据（手动调用）
+function refreshSiteData() {
+    return new Promise(function(resolve, reject) {
+        fetch('/api/site-content', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('API不可用');
+        })
+        .then(function(result) {
+            if (result.success && result.data) {
+                localStorage.setItem('freeman_data', JSON.stringify(result.data));
+                console.log('已从服务器刷新数据');
+                resolve(result.data);
+            } else {
+                reject(new Error('获取数据失败'));
+            }
+        })
+        .catch(function(e) {
+            console.warn('刷新数据失败', e);
+            reject(e);
+        });
+    });
 }

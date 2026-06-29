@@ -301,7 +301,7 @@
         }
         .section-title {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 14px;
         }
         .section-title .icon {
@@ -458,8 +458,8 @@
             margin-bottom: 10px;
         }
         .option-icon {
-            width: 44px;
-            height: 44px;
+            width: 60px;
+            height: 60px;
             background: #f8f8f8;
             border-radius: 10px;
             display: flex;
@@ -468,6 +468,16 @@
             flex-shrink: 0;
             font-size: 20px;
             transition: all 0.2s;
+            overflow: hidden;
+        }
+        .option-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .option-icon:empty {
+            display: none;
         }
         .option-card.selected .option-icon {
             background: #fff3eb;
@@ -967,6 +977,7 @@
                 <li><a href="cases.html">案例</a></li>
                 <li><a href="faq.html">FAQ</a></li>
                 <li><a href="inquiry.html">询价</a></li>
+                <li class="lang-switch">EN</li>
             </ul>
         </div>
     </nav>
@@ -1125,7 +1136,8 @@
     <script>
         // 价格格式化函数 - 添加千分位
         function formatPrice(price) {
-            return '$' + price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            var numPrice = parseFloat(price) || 0;
+            return '¥' + numPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
         // 默认配置数据
@@ -3552,7 +3564,7 @@ Folding version`,
             container.innerHTML = configData.configProducts.map(function(p) {
                 return '<div class="product-card" onclick="selectProduct(\'' + p.id + '\')">' +
                     '<div class="product-card-images">' +
-                    '<img src="' + p.image + '" alt="' + p.name + '">' +
+                    (p.image ? '<img src="' + p.image + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' : '') +
                     '<div class="product-price-badge">基础价格: ' + formatPrice(p.price) + '</div>' +
                     '</div>' +
                     '<div class="product-card-info">' +
@@ -3628,8 +3640,12 @@ Folding version`,
                         '<div class="config-grid">';
                     
                     group.items.forEach(function(item) {
+                        let itemIconHtml = '';
+                        if (item.image && item.image.length > 0) {
+                            itemIconHtml = '<img src="' + item.image + '" alt="' + (item.name || '') + '" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onerror="this.style.display=\'none\'">';
+                        }
                         html += '<div class="config-item">' +
-                            '<span class="check">✓</span>' +
+                            (itemIconHtml ? itemIconHtml : '<span class="check">✓</span>') +
                             '<div class="info">' +
                             '<h4>' + item.name + '</h4>' +
                             '<p>' + item.desc + '</p>' +
@@ -3649,6 +3665,7 @@ Folding version`,
                     html += '<div class="section" id="section-' + group.id + '">' +
                         '<div class="section-header" onclick="toggleSection(\'section-' + group.id + '\')">' +
                         '<div class="section-title">' +
+                        (group.image && group.image.length > 0 ? '<img src="' + group.image + '" alt="' + (group.name || '') + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onerror="this.style.display=\'none\'">' : '') +
                         '<div>' +
                         '<h3>' + group.name + '</h3>' +
                         '<p>' + group.desc + '</p>' +
@@ -3663,7 +3680,10 @@ Folding version`,
                         const isSelected = selectedOptions[group.id] && selectedOptions[group.id].id === item.id;
                         let priceClass = '';
                         let priceText = '';
-                        const icon = item.icon || '⬛';
+                        let iconHtml = '';
+                        if (item.image && item.image.length > 0) {
+                            iconHtml = '<img src="' + item.image + '" alt="' + (item.name || '') + '" onerror="this.parentElement.style.display=\'none\'">';
+                        }
                         
                         if (item.price === 0 && item.isDefault) {
                             priceClass = 'included';
@@ -3677,7 +3697,7 @@ Folding version`,
                         
                         html += '<div class="option-card' + (isSelected ? ' selected' : '') + '" onclick="selectSingleOption(\'' + group.id + '\', this, \'' + item.id + '\', ' + item.price + ', \'' + item.name.replace(/'/g, "\\'") + '\')">' +
                             '<div class="option-card-header">' +
-                            '<div class="option-icon">' + icon + '</div>' +
+                            (iconHtml ? '<div class="option-icon">' + iconHtml + '</div>' : '') +
                             '<div class="option-info">' +
                             '<h4>' + item.name + (item.isDefault ? ' <span class="badge">标配</span>' : '') + '</h4>' +
                             '<p>' + item.desc + '</p>' +
@@ -3698,6 +3718,7 @@ Folding version`,
                     html += '<div class="section" id="section-' + group.id + '">' +
                         '<div class="section-header" onclick="toggleSection(\'section-' + group.id + '\')">' +
                         '<div class="section-title">' +
+                        (group.image && group.image.length > 0 ? '<img src="' + group.image + '" alt="' + (group.name || '') + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onerror="this.style.display=\'none\'">' : '') +
                         '<div>' +
                         '<h3>' + group.name + '</h3>' +
                         '<p>' + group.desc + '</p>' +
@@ -3711,11 +3732,14 @@ Folding version`,
                     group.items.forEach(function(item) {
                         const isSelected = selectedAddons[group.id] && selectedAddons[group.id].some(function(i) { return i.id === item.id; });
                         let priceText = '+' + formatPrice(item.price);
-                        const icon = item.icon || '🔧';
+                        let iconHtml = '';
+                        if (item.image && item.image.length > 0) {
+                            iconHtml = '<img src="' + item.image + '" alt="' + (item.name || '') + '" onerror="this.parentElement.style.display=\'none\'">';
+                        }
                         
                         html += '<div class="option-card multiple' + (isSelected ? ' selected' : '') + '" onclick="toggleAddonOption(\'' + group.id + '\', this, \'' + item.id + '\', ' + item.price + ', \'' + item.name.replace(/'/g, "\\'") + '\')">' +
                             '<div class="option-card-header">' +
-                            '<div class="option-icon">' + icon + '</div>' +
+                            (iconHtml ? '<div class="option-icon">' + iconHtml + '</div>' : '') +
                             '<div class="option-info">' +
                             '<h4>' + item.name + '</h4>' +
                             '<p>' + item.desc + '</p>' +

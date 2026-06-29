@@ -382,12 +382,12 @@
         }
         .feature-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
         }
         .feature-card {
             position: relative;
-            height: 400px;
+            height: 360px;
             border-radius: 0;
             overflow: hidden;
             text-decoration: none;
@@ -414,6 +414,9 @@
         }
         .feature-card-cases {
             background: #1a1a1a url('https://aka.doubaocdn.com/s/xDQy1wodQS') center/cover;
+        }
+        .feature-card-faq {
+            background: #1a1a1a url('https://aka.doubaocdn.com/s/V27P1wodQR') center/cover;
         }
         .feature-card-content {
             position: relative;
@@ -476,7 +479,7 @@
                 grid-template-columns: 1fr;
             }
             .feature-card {
-                height: 320px;
+                height: 280px;
             }
             .feature-card-content {
                 padding: 32px;
@@ -568,6 +571,14 @@
                         <h3 class="feature-card-title" data-i18n="home.casesTitle">客户案例</h3>
                         <p class="feature-card-desc" data-i18n="home.casesDesc">看看其他玩家的精彩旅程，获取灵感，开启你的户外冒险。</p>
                         <span class="feature-card-btn" data-i18n="home.viewCases">浏览案例 →</span>
+                    </div>
+                </a>
+                <a href="faq.html" class="feature-card feature-card-faq">
+                    <div class="feature-card-content">
+                        <span class="feature-card-label">常见问题</span>
+                        <h3 class="feature-card-title">FAQ</h3>
+                        <p class="feature-card-desc">关于产品、定制、交付、售后的常见问题解答，帮你快速了解我们的服务。</p>
+                        <span class="feature-card-btn">查看问答 →</span>
                     </div>
                 </a>
             </div>
@@ -735,5 +746,6 @@
         });
     </script>
     <script src="editable.js"></script>
+    <script src="floating-inquiry.js"></script>
 </body>
 </html>

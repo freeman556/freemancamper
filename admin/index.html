@@ -1061,19 +1061,22 @@
                     <div class="card">
                         <h3 style="margin-bottom: 20px;">数据管理</h3>
                         <p style="font-size: 13px; color: #666; margin-bottom: 16px;">
-                            💡 导出数据后，可以替换到代码里让所有访客都看到修改后的内容
+                            💡 <span id="storageMode">当前模式：本地存储</span>
                         </p>
-                        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-                            <button class="btn btn-primary" onclick="exportData()">📤 导出数据</button>
+                        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="exportData()">📤 导出 JSON 数据</button>
+                            <button class="btn btn-default" onclick="exportSiteDataJs()">📄 导出 site-data.js</button>
                             <button class="btn btn-default" onclick="document.getElementById('importFile').click()">📥 导入数据</button>
                             <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
                         </div>
                         <div style="background: #fffbe6; border: 1px solid #ffe58f; padding: 12px; border-radius: 6px; font-size: 13px; color: #8c6e00;">
                             <strong>使用说明：</strong><br>
                             1. 在后台修改好产品、分类、配置等内容<br>
-                            2. 点击「导出数据」下载 JSON 文件<br>
-                            3. 用下载的文件替换 <code>assets/js/data.js</code> 里的 defaultData<br>
-                            4. 重新上传到 GitHub，所有人就能看到修改后的内容了
+                            2. 点击「导出 site-data.js」下载 JS 文件<br>
+                            3. 用下载的文件替换网站根目录的 <code>site-data.js</code><br>
+                            4. 重新上传到 GitHub，所有人就能看到修改后的内容了<br>
+                            <br>
+                            <strong>💡 小提示：</strong>如果您运行了 Node.js 服务器（server.js），数据会自动保存到服务器，无需手动导出部署。
                         </div>
                     </div>
                 </div>
@@ -1467,6 +1470,96 @@
     </div>
 
     <script>
+        // ==================== 全局变量 ====================
+        let isImageProcessing = false; // 图片处理中标志
+        
+        // ==================== API 配置 ====================
+        const API_CONFIG = {
+            baseUrl: '', // 空字符串表示同域名
+            useApi: false, // 是否使用后端API，自动检测
+            token: localStorage.getItem('adminToken') || ''
+        };
+
+        // 检测后端API是否可用
+        async function checkApiAvailable() {
+            try {
+                // 用登录接口检测API是否可用（不需要登录）
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: 'test' })
+                });
+                // 只要有响应（不管成功失败），说明API可用
+                if (response.status === 200 || response.status === 401) {
+                    API_CONFIG.useApi = true;
+                    console.log('后端API可用，将使用服务器端存储');
+                    return true;
+                }
+            } catch (e) {
+                console.log('后端API不可用，使用本地存储模式');
+            }
+            API_CONFIG.useApi = false;
+            return false;
+        }
+
+        // API 请求工具函数
+        async function apiRequest(path, options = {}) {
+            if (!API_CONFIG.useApi) {
+                return { success: false, message: 'API不可用' };
+            }
+
+            const url = API_CONFIG.baseUrl + path;
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (API_CONFIG.token) {
+                headers['Authorization'] = 'Bearer ' + API_CONFIG.token;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                const result = await response.json();
+                return result;
+            } catch (e) {
+                console.error('API请求失败:', e);
+                return { success: false, message: '网络错误' };
+            }
+        }
+
+        // 上传图片到服务器
+        async function uploadImageToServer(file) {
+            if (!API_CONFIG.useApi) {
+                return null;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + API_CONFIG.token
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success && result.url) {
+                    return result.url;
+                }
+            } catch (e) {
+                console.error('图片上传失败:', e);
+            }
+            return null;
+        }
+
         // 默认数据
         const defaultData = {
             config: {
@@ -1805,71 +1898,51 @@
             };
         }
 
-        // ========== 图片压缩函数 ==========
-        function compressImage(file, maxWidth, maxHeight, quality) {
-            return new Promise(function(resolve, reject) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        // 计算缩放比例
-                        if (width > maxWidth || height > maxHeight) {
-                            const ratio = Math.min(maxWidth / width, maxHeight / height);
-                            width = Math.round(width * ratio);
-                            height = Math.round(height * ratio);
-                        }
-                        
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // 压缩为base64
-                        const compressed = canvas.toDataURL('image/jpeg', quality);
-                        resolve(compressed);
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // 图片处理中标记
-        let isImageProcessing = false;
-
-        // ========== 通用图片上传处理（带压缩） ==========
+        // ========== 通用图片上传处理 ==========
         function handleImageUpload(event, previewId, inputId, removeBtnId) {
             const file = event.target.files[0];
-            if (file) {
-                isImageProcessing = true;
-                // 显示上传中提示
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // 先直接显示原图，确保预览能出来
+                const dataUrl = e.target.result;
+                document.getElementById(inputId).value = dataUrl;
                 const preview = document.getElementById(previewId);
-                preview.alt = '处理中...';
+                preview.src = dataUrl;
                 preview.style.display = 'block';
-                preview.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5OTkiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTIxIDEydjNhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDciPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDEyIDEyIiB0bz0iMzYwIDEyIDEyIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPjwvcGF0aD48L3N2Zz4=';
+                document.getElementById(removeBtnId).style.display = 'flex';
+                const placeholder = preview.parentElement.querySelector('.placeholder');
+                if (placeholder) placeholder.style.display = 'none';
                 
-                // 压缩图片：最大600x600，质量0.6，确保体积小、处理快
-                compressImage(file, 600, 600, 0.6).then(function(compressedDataUrl) {
-                    document.getElementById(inputId).value = compressedDataUrl;
-                    preview.src = compressedDataUrl;
-                    preview.alt = '';
-                    document.getElementById(removeBtnId).style.display = 'flex';
-                    // 隐藏占位符
-                    preview.parentElement.querySelector('.placeholder') && (preview.parentElement.querySelector('.placeholder').style.display = 'none');
-                    isImageProcessing = false;
-                }).catch(function(err) {
-                    alert('图片处理失败，请重试或选择更小的图片');
-                    console.error(err);
-                    preview.style.display = 'none';
-                    isImageProcessing = false;
-                });
-            }
+                // 如果图片太大，后台压缩一下再保存（避免localStorage存不下）
+                if (file.size > 300 * 1024) {
+                    isImageProcessing = true;
+                    setTimeout(function() {
+                        const img = new Image();
+                        img.onload = function() {
+                            let w = img.width, h = img.height;
+                            const max = 500;
+                            if (w > max || h > max) {
+                                if (w > h) { h = Math.round(h * max / w); w = max; }
+                                else { w = Math.round(w * max / h); h = max; }
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = w; canvas.height = h;
+                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            const compressed = canvas.toDataURL('image/jpeg', 0.5);
+                            document.getElementById(inputId).value = compressed;
+                            preview.src = compressed;
+                            isImageProcessing = false;
+                        };
+                        img.onerror = function() {
+                            isImageProcessing = false;
+                        };
+                        img.src = dataUrl;
+                    }, 100);
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         function handleRemoveImage(previewId, inputId, removeBtnId) {
@@ -1951,13 +2024,41 @@
         }
 
         // 初始化
-        function init() {
-            loadData();
+        async function init() {
+            await checkApiAvailable();
+            await loadData();
             checkAuth();
         }
 
         // 加载数据
-        function loadData() {
+        async function loadData() {
+            // 先尝试从API加载（仅当API可用且有有效token时）
+            if (API_CONFIG.useApi && API_CONFIG.token && !API_CONFIG.token.startsWith('local_mode_')) {
+                try {
+                    const result = await apiRequest('/api/site-content');
+                    if (result.success && result.data) {
+                        data = result.data;
+                        // 数据迁移：确保所有字段都存在（兼容旧数据）
+                        if (!data.configurator || !data.configurator.products) {
+                            data.configurator = JSON.parse(JSON.stringify(defaultData.configurator));
+                        }
+                        if (!data.categories) data.categories = [];
+                        if (!data.products) data.products = [];
+                        if (!data.cases) data.cases = [];
+                        if (!data.faqs) data.faqs = [];
+                        if (!data.inquiries) data.inquiries = [];
+                        if (!data.config) data.config = {};
+                        // 同时保存到localStorage作为缓存
+                        localStorage.setItem('freeman_data', JSON.stringify(data));
+                        console.log('已从服务器加载数据');
+                        return;
+                    }
+                } catch (e) {
+                    console.log('从API加载数据失败，使用本地缓存数据');
+                }
+            }
+
+            // 从localStorage加载
             const saved = localStorage.getItem('freeman_data');
             if (saved) {
                 data = JSON.parse(saved);
@@ -1978,7 +2079,7 @@
         }
 
         // 保存数据
-        function saveData() {
+        async function saveData() {
             if (isImageProcessing) {
                 alert('图片正在处理中，请稍等1-2秒再保存');
                 return false;
@@ -1986,22 +2087,40 @@
             try {
                 const dataStr = JSON.stringify(data);
                 localStorage.setItem('freeman_data', dataStr);
-                console.log('数据已保存，大小：' + Math.round(dataStr.length / 1024) + 'KB');
+                console.log('数据已保存到本地，大小：' + Math.round(dataStr.length / 1024) + 'KB');
             } catch (e) {
                 alert('保存失败：存储空间不足！\n请删除一些不用的图片，或使用更小的图片（建议单张图片不超过300KB）');
-                console.error('保存失败', e);
+                console.error('本地保存失败', e);
                 return false;
             }
+
+            // 如果API可用，同步到服务器
+            if (API_CONFIG.useApi && API_CONFIG.token && !API_CONFIG.token.startsWith('local_mode_')) {
+                try {
+                    const result = await apiRequest('/api/save-content', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                    if (result.success) {
+                        console.log('数据已同步到服务器');
+                    } else {
+                        console.warn('同步到服务器失败:', result.message);
+                    }
+                } catch (e) {
+                    console.warn('同步到服务器失败:', e);
+                }
+            }
+
             return true;
         }
 
-        // 获取存储的密码（默认 admin123）
+        // 获取存储的密码（默认 admin321）
         function getAdminPassword() {
             return localStorage.getItem('adminPassword') || 'admin321';
         }
 
         // 登录
-        function login() {
+        async function login() {
             const password = document.getElementById('passwordInput').value;
             const errorEl = document.getElementById('loginError');
             errorEl.style.display = 'none';
@@ -2012,8 +2131,33 @@
                 return;
             }
 
+            // 先尝试API登录
+            if (API_CONFIG.useApi) {
+                try {
+                    const result = await apiRequest('/api/login', {
+                        method: 'POST',
+                        body: JSON.stringify({ password })
+                    });
+
+                    if (result.success && result.token) {
+                        API_CONFIG.token = result.token;
+                        localStorage.setItem('adminToken', result.token);
+                        // 从服务器重新加载数据
+                        await loadData();
+                        showAdmin();
+                        loadSubmissions();
+                        return;
+                    }
+                } catch (e) {
+                    console.log('API登录失败，尝试本地登录');
+                }
+            }
+
+            // 本地密码验证（回退方案）
             if (password === getAdminPassword()) {
-                localStorage.setItem('adminToken', 'local_mode_' + Date.now());
+                const localToken = 'local_mode_' + Date.now();
+                API_CONFIG.token = localToken;
+                localStorage.setItem('adminToken', localToken);
                 showAdmin();
                 loadSubmissions();
             } else {
@@ -2043,6 +2187,7 @@
             loadConfigurator();
             loadSettings();
             loadInquiries();
+            updateStorageModeDisplay();
         }
 
         // 检查登录状态
@@ -2207,13 +2352,87 @@
             URL.revokeObjectURL(url);
         }
 
+        // 导出 site-data.js 文件（可直接替换）
+        function exportSiteDataJs() {
+            const exportData = JSON.parse(JSON.stringify(data));
+            // 移除 inquiries（询价记录不需要导出到默认数据）
+            delete exportData.inquiries;
+
+            const jsContent = `// 网站默认数据 - 部署后所有访问者都能看到的基础数据
+// 管理员可以在后台修改数据，修改后的数据保存在浏览器 localStorage 中
+// 如果需要让所有访问者看到修改后的内容，请导出数据并替换此文件后重新部署
+
+const SITE_DEFAULT_DATA = ${JSON.stringify(exportData, null, 4)};
+
+// 自动初始化：如果 localStorage 中没有数据，就用默认数据初始化
+// 这样普通访问者第一次访问网站时也能看到完整内容
+(function() {
+    try {
+        const existingData = localStorage.getItem('freeman_data');
+        if (!existingData) {
+            localStorage.setItem('freeman_data', JSON.stringify(SITE_DEFAULT_DATA));
+            console.log('已初始化网站默认数据');
+        }
+    } catch (e) {
+        console.warn('无法初始化网站数据', e);
+    }
+})();
+
+// 获取网站数据 - 从 localStorage 读取
+function getSiteData() {
+    try {
+        const saved = localStorage.getItem('freeman_data');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error('读取本地数据失败', e);
+    }
+    return null;
+}
+
+// 保存网站数据到 localStorage
+function saveSiteData(data) {
+    try {
+        localStorage.setItem('freeman_data', JSON.stringify(data));
+        return true;
+    } catch (e) {
+        console.error('保存数据失败', e);
+        return false;
+    }
+}
+`;
+
+            const blob = new Blob([jsContent], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'site-data.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 更新存储模式显示
+        function updateStorageModeDisplay() {
+            const el = document.getElementById('storageMode');
+            if (!el) return;
+            
+            if (API_CONFIG.useApi && API_CONFIG.token && !API_CONFIG.token.startsWith('local_mode_')) {
+                el.innerHTML = '当前模式：<span style="color: #52c41a;">服务器存储</span> - 数据已自动保存到服务器';
+            } else {
+                el.innerHTML = '当前模式：<span style="color: #faad14;">本地存储</span> - 请导出数据后重新部署';
+            }
+        }
+
         // 导入数据
-        function importData(event) {
+        async function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (confirm('确定要导入数据吗？这会覆盖当前所有数据！')) {
@@ -2221,7 +2440,7 @@
                         const inquiries = data.inquiries || [];
                         data = imported;
                         if (!data.inquiries) data.inquiries = inquiries;
-                        saveData();
+                        await saveData();
                         
                         // 重新加载所有页面
                         loadProducts();
@@ -2231,6 +2450,7 @@
                         loadConfigurator();
                         loadSettings();
                         updateStats();
+                        updateStorageModeDisplay();
                         
                         alert('数据导入成功！');
                     }
@@ -2488,7 +2708,7 @@
             }
 
             if (id) {
-                const cat = data.categories.find(function(c) { return c.id === parseInt(id); });
+                const cat = data.categories.find(function(c) { return String(c.id) === String(id); });
                 if (cat) {
                     cat.name = name;
                     cat.icon = icon;
@@ -2720,9 +2940,10 @@
             const typeBadges = { standard: 'badge-success', upgrade: 'badge-info', addon: 'badge-warning' };
 
             data.configurator.products.forEach(function(p) {
+                var productPrice = parseFloat(p.price) || 0;
                 html += '<div class="config-group-card" style="margin-bottom: 24px; border-left: 4px solid #c8663a;">' +
                     '<div class="config-group-header">' +
-                    '<div class="config-group-title">' + p.name + ' - $' + p.price.toFixed(2) + '</div>' +
+                    '<div class="config-group-title">' + p.name + ' - ¥' + productPrice.toFixed(2) + '</div>' +
                     '<div class="action-btns">' +
                     '<button class="btn btn-sm btn-primary" onclick="openConfigGroupModal(\'' + p.id + '\')">+ 为该产品添加分组</button>' +
                     '<button class="btn btn-sm btn-default" onclick="editConfigProduct(\'' + p.id + '\')">编辑产品</button>' +
@@ -2771,7 +2992,7 @@
                                     '<span style="font-size: 12px; color: #666; margin-left: 8px;">' + item.desc + '</span>' +
                                     '</div>' +
                                     '<div style="display: flex; align-items: center; gap: 8px;">' +
-                                    '<span class="config-item-price" style="font-size: 13px;">' + (item.price > 0 ? '+$' + item.price.toFixed(2) : '免费') + '</span>' +
+                                    '<span class="config-item-price" style="font-size: 13px;">' + (parseFloat(item.price) > 0 ? '+¥' + parseFloat(item.price).toFixed(2) : '免费') + '</span>' +
                                     '<button class="btn btn-sm btn-default" style="padding: 2px 8px; font-size: 12px;" onclick="editConfigItem(\'' + p.id + '\', \'' + g.id + '\', \'' + item.id + '\')">编辑</button>' +
                                     '<button class="btn btn-sm btn-danger" style="padding: 2px 8px; font-size: 12px;" onclick="deleteConfigItem(\'' + p.id + '\', \'' + g.id + '\', \'' + item.id + '\')">删除</button>' +
                                     '</div>' +
@@ -2809,7 +3030,7 @@
 
         // 编辑配置器产品
         function editConfigProduct(id) {
-            const item = data.configurator.products.find(function(p) { return p.id === id; });
+            const item = data.configurator.products.find(function(p) { return String(p.id) === String(id); });
             if (!item) return;
 
             document.getElementById('configProductModalTitle').textContent = '编辑配置器产品';
@@ -2838,7 +3059,7 @@
             }
 
             if (id) {
-                const item = data.configurator.products.find(function(p) { return p.id === id; });
+                const item = data.configurator.products.find(function(p) { return String(p.id) === String(id); });
                 if (item) {
                     item.name = name;
                     item.price = price;
@@ -2864,7 +3085,7 @@
         // 删除配置器产品
         function deleteConfigProduct(id) {
             if (confirm('确定要删除这个产品吗？')) {
-                data.configurator.products = data.configurator.products.filter(function(p) { return p.id !== id; });
+                data.configurator.products = data.configurator.products.filter(function(p) { return String(p.id) !== String(id); });
                 saveData();
                 loadConfigurator();
             }
@@ -2894,9 +3115,9 @@
 
         // 编辑配置分组
         function editConfigGroup(productId, groupId) {
-            const product = data.configurator.products.find(function(p) { return p.id === productId; });
+            const product = data.configurator.products.find(function(p) { return String(p.id) === String(productId); });
             if (!product) return;
-            const group = product.groups.find(function(g) { return g.id === groupId; });
+            const group = product.groups.find(function(g) { return String(g.id) === String(groupId); });
             if (!group) return;
 
             document.getElementById('configGroupModalTitle').textContent = '编辑配置分组';
@@ -2935,12 +3156,12 @@
                 return;
             }
 
-            const product = data.configurator.products.find(function(p) { return p.id === productId; });
-            if (!product) return;
+            const product = data.configurator.products.find(function(p) { return String(p.id) === String(productId); });
+            if (!product) { console.error('Product not found:', productId); return; }
             if (!product.groups) product.groups = [];
 
             if (id) {
-                const group = product.groups.find(function(g) { return g.id === id; });
+                const group = product.groups.find(function(g) { return String(g.id) === String(id); });
                 if (group) {
                     group.name = name;
                     group.type = type;
@@ -2966,9 +3187,9 @@
         // 删除配置分组
         function deleteConfigGroup(productId, groupId) {
             if (confirm('确定要删除这个分组吗？分组下的所有配置项也会被删除。')) {
-                const product = data.configurator.products.find(function(p) { return p.id === productId; });
+                const product = data.configurator.products.find(function(p) { return String(p.id) === String(productId); });
                 if (product) {
-                    product.groups = product.groups.filter(function(g) { return g.id !== groupId; });
+                    product.groups = product.groups.filter(function(g) { return String(g.id) !== String(groupId); });
                     saveData();
                     loadConfigurator();
                 }
@@ -2994,11 +3215,11 @@
 
         // 编辑配置项
         function editConfigItem(productId, groupId, itemId) {
-            const product = data.configurator.products.find(function(p) { return p.id === productId; });
+            const product = data.configurator.products.find(function(p) { return String(p.id) === String(productId); });
             if (!product) return;
-            const group = product.groups.find(function(g) { return g.id === groupId; });
+            const group = product.groups.find(function(g) { return String(g.id) === String(groupId); });
             if (!group) return;
-            const item = group.items.find(function(i) { return i.id === itemId; });
+            const item = group.items.find(function(i) { return String(i.id) === String(itemId); });
             if (!item) return;
 
             document.getElementById('configItemModalTitle').textContent = '编辑配置项';
@@ -3032,13 +3253,13 @@
                 return;
             }
 
-            const product = data.configurator.products.find(function(p) { return p.id === productId; });
-            if (!product) return;
-            const group = product.groups.find(function(g) { return g.id === groupId; });
-            if (!group) return;
+            const product = data.configurator.products.find(function(p) { return String(p.id) === String(productId); });
+            if (!product) { console.error('Product not found:', productId); return; }
+            const group = product.groups.find(function(g) { return String(g.id) === String(groupId); });
+            if (!group) { console.error('Group not found:', groupId); return; }
 
             if (id) {
-                const item = group.items.find(function(i) { return i.id === id; });
+                const item = group.items.find(function(i) { return String(i.id) === String(id); });
                 if (item) {
                     item.name = name;
                     item.desc = desc;
@@ -3065,11 +3286,11 @@
         // 删除配置项
         function deleteConfigItem(productId, groupId, itemId) {
             if (confirm('确定要删除这个配置项吗？')) {
-                const product = data.configurator.products.find(function(p) { return p.id === productId; });
+                const product = data.configurator.products.find(function(p) { return String(p.id) === String(productId); });
                 if (product) {
-                    const group = product.groups.find(function(g) { return g.id === groupId; });
+                    const group = product.groups.find(function(g) { return String(g.id) === String(groupId); });
                     if (group) {
-                        group.items = group.items.filter(function(i) { return i.id !== itemId; });
+                        group.items = group.items.filter(function(i) { return String(i.id) !== String(itemId); });
                         saveData();
                         loadConfigurator();
                     }

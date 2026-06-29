@@ -337,20 +337,55 @@
         }
 
         // ========== 通用图片上传处理 ==========
+        // 图片压缩函数
+        function compressImage(file, maxWidth, quality) {
+            return new Promise(function(resolve, reject) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // 计算压缩后的尺寸
+                        if (width > maxWidth) {
+                            height = Math.round(height * maxWidth / width);
+                            width = maxWidth;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // 转成base64
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         function handleImageUpload(event, previewId, inputId, removeBtnId) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(inputId).value = e.target.result;
+                // 压缩图片：最大宽度800px，质量0.7，确保能存入localStorage
+                compressImage(file, 800, 0.7).then(function(compressedDataUrl) {
+                    document.getElementById(inputId).value = compressedDataUrl;
                     const preview = document.getElementById(previewId);
-                    preview.src = e.target.result;
+                    preview.src = compressedDataUrl;
                     preview.style.display = 'block';
                     document.getElementById(removeBtnId).style.display = 'flex';
                     // 隐藏占位符
                     preview.parentElement.querySelector('.placeholder') && (preview.parentElement.querySelector('.placeholder').style.display = 'none');
-                };
-                reader.readAsDataURL(file);
+                }).catch(function(err) {
+                    console.error('图片处理失败', err);
+                    alert('图片上传失败，请尝试更小的图片');
+                });
             }
         }
 

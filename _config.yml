@@ -1,0 +1,56 @@
+# FREE MAN 露营装备官网 - GitHub Pages 配置
+title: FREE MAN 皮卡露营装备
+description: 专注户外皮卡露营装备研发与制造，从背驼房箱到拖挂房车，陪伴你走遍山川湖海
+url: "https://your-username.github.io"
+baseurl: "/freeman-camper" # 如果是用户主页或自定义域名，留空即可
+
+# 静态文件配置
+include:
+  - "_headers"
+  - "_redirects"
+
+# 排除不需要部署的文件
+exclude:
+  - README.md
+  - server.js
+  - package.json
+  - node_modules
+  - uploads/
+  - data/
+  - "*.log"
+  - .gitignore
+  - original_page.html
+  - README.html
+
+# 构建设置
+markdown: false
+kramdown:
+  input: GFM
+  syntax_highlighter: none
+
+# 插件关闭（纯静态网站不需要）
+plugins: []
+
+# 字符编码
+encoding: utf-8
+
+# 永久链接格式（静态HTML不需要）
+permalink: /:path/:basename:output_ext
+
+# 默认MIME类型（确保视频等文件正确识别）
+defaults:
+  - scope:
+      path: "**/*.mp4"
+    values:
+      mime_type: "video/mp4"
+  - scope:
+      path: "**/*.webm"
+    values:
+      mime_type: "video/webm"
+  - scope:
+      path: "assets/**"
+    values:
+      layout: null
+
+# 主题设置（不使用Jekyll主题）
+theme: null

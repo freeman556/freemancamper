@@ -977,6 +977,7 @@
                 <li><a href="cases.html">案例</a></li>
                 <li><a href="faq.html">FAQ</a></li>
                 <li><a href="inquiry.html">询价</a></li>
+                <li class="lang-switch">EN</li>
             </ul>
         </div>
     </nav>
@@ -3493,6 +3494,15 @@ Folding version`,
             loadConfigData();
             loadContactInfo();
             renderProductSelector();
+            // 检查URL hash，刷新后保持在配置页面
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#product-')) {
+                const productId = hash.replace('#product-', '');
+                // 延迟一下确保DOM渲染完成
+                setTimeout(function() {
+                    selectProduct(productId);
+                }, 100);
+            }
         }
 
         // 加载配置数据
@@ -3619,6 +3629,8 @@ Folding version`,
             
             renderConfigGroups();
             updatePrice();
+            // 更新URL hash，刷新后保持在配置页面
+            history.replaceState(null, '', '#product-' + productId);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -3844,6 +3856,8 @@ Folding version`,
             document.querySelector('.page-header').style.display = 'block';
             document.getElementById('pageTitle').textContent = '选择您的产品';
             document.getElementById('pageSubtitle').textContent = '选择一款产品开始配置，打造您的专属户外露营装备。';
+            // 清除URL hash
+            history.replaceState(null, '', location.pathname);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 

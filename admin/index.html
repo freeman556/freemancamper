@@ -986,14 +986,9 @@
                         <h3 style="margin-bottom: 20px;">Logo设置</h3>
                         <div class="form-group">
                             <label>Logo图片URL</label>
-                            <input type="text" id="settingLogo" placeholder="输入图片URL">
+                            <input type="text" id="settingLogo" placeholder="输入图片URL，如 https://example.com/logo.png" oninput="previewImageFromUrl(this, 'logoPreview')">
                         </div>
-                        <div class="upload-area" onclick="document.getElementById('logoUpload').click()">
-                            <div class="icon">📤</div>
-                            <p>点击上传Logo图片</p>
-                            <input type="file" id="logoUpload" accept="image/*" style="display: none" onchange="uploadLogo(event)">
-                        </div>
-                        <img id="logoPreview" class="preview-img" style="display: none;">
+                        <img id="logoPreview" class="preview-img" style="display: none; border: 1px solid #eee;">
                         <button class="btn btn-primary" style="margin-top: 16px;" onclick="saveLogoSettings()">保存Logo</button>
                     </div>
 
@@ -1001,14 +996,9 @@
                         <h3 style="margin-bottom: 20px;">首页大图</h3>
                         <div class="form-group">
                             <label>首页大图URL</label>
-                            <input type="text" id="settingHero" placeholder="输入图片URL">
+                            <input type="text" id="settingHero" placeholder="输入图片URL，如 https://example.com/hero.jpg" oninput="previewImageFromUrl(this, 'heroPreview')">
                         </div>
-                        <div class="upload-area" onclick="document.getElementById('heroUpload').click()">
-                            <div class="icon">📤</div>
-                            <p>点击上传首页大图</p>
-                            <input type="file" id="heroUpload" accept="image/*" style="display: none" onchange="uploadHero(event)">
-                        </div>
-                        <img id="heroPreview" class="preview-img" style="display: none;">
+                        <img id="heroPreview" class="preview-img" style="display: none; border: 1px solid #eee;">
                         <button class="btn btn-primary" style="margin-top: 16px;" onclick="saveHeroSettings()">保存大图</button>
                     </div>
 
@@ -1108,20 +1098,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>产品图片</label>
-                    <div class="image-upload-wrapper">
-                        <div class="upload-area" style="flex: 1; padding: 20px;" onclick="document.getElementById('productImageUpload').click()">
-                            <div class="icon">📤</div>
-                            <p>点击上传产品图片</p>
-                            <input type="file" id="productImageUpload" accept="image/*" style="display: none" onchange="uploadProductImage(event)">
-                        </div>
-                        <div class="image-preview-wrapper" id="productImagePreviewWrapper">
-                            <span class="placeholder">预览</span>
-                            <img id="productImagePreview" style="display: none;">
-                            <button class="remove-image" style="display: none;" id="productImageRemove" onclick="removeProductImage()">✕</button>
-                        </div>
-                    </div>
-                    <input type="hidden" id="productImage">
+                    <label>产品图片URL</label>
+                    <input type="text" id="productImage" placeholder="输入图片URL，如 https://example.com/product.jpg" oninput="previewImageFromUrl(this, 'productImagePreview')" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <img id="productImagePreview" class="preview-img" style="display: none; margin-top: 12px; border: 1px solid #eee; max-width: 200px;">
                 </div>
                 <div class="form-group">
                     <label>产品描述（支持图片上传、拖拽排序）</label>
@@ -1165,20 +1144,9 @@
                     <input type="text" id="categoryName" placeholder="请输入分类名称">
                 </div>
                 <div class="form-group">
-                    <label>分类图标</label>
-                    <div class="image-upload-wrapper">
-                        <div class="upload-area" style="flex: 1; padding: 20px;" onclick="document.getElementById('categoryIconUpload').click()">
-                            <div class="icon">📤</div>
-                            <p>点击上传分类图标</p>
-                            <input type="file" id="categoryIconUpload" accept="image/*" style="display: none" onchange="uploadCategoryIcon(event)">
-                        </div>
-                        <div class="image-preview-wrapper" id="categoryIconPreviewWrapper">
-                            <span class="placeholder">预览</span>
-                            <img id="categoryIconPreview" style="display: none;">
-                            <button class="remove-image" style="display: none;" id="categoryIconRemove" onclick="removeCategoryIcon()">✕</button>
-                        </div>
-                    </div>
-                    <input type="hidden" id="categoryIcon">
+                    <label>分类图标URL（可选，也可输入emoji如 🚚）</label>
+                    <input type="text" id="categoryIcon" placeholder="输入图片URL或emoji图标" oninput="previewCategoryIcon(this)" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <img id="categoryIconPreview" class="preview-img" style="display: none; margin-top: 12px; border: 1px solid #eee; max-width: 100px;">
                 </div>
             </div>
             <div class="modal-footer">
@@ -1207,20 +1175,9 @@
                         <input type="text" id="caseTag" placeholder="皮卡背驼">
                     </div>
                     <div class="form-group">
-                        <label>案例封面图</label>
-                        <div class="image-upload-wrapper" style="gap: 8px;">
-                            <div class="upload-area" style="flex: 1; padding: 12px; font-size: 12px;" onclick="document.getElementById('caseImageUpload').click()">
-                                <div class="icon" style="font-size: 20px;">📤</div>
-                                <p style="font-size: 12px;">点击上传</p>
-                                <input type="file" id="caseImageUpload" accept="image/*" style="display: none" onchange="uploadCaseImage(event)">
-                            </div>
-                            <div class="image-preview-wrapper" id="caseImagePreviewWrapper" style="width: 60px; height: 60px;">
-                                <span class="placeholder" style="font-size: 10px;">预览</span>
-                                <img id="caseImagePreview" style="display: none;">
-                                <button class="remove-image" style="display: none;" id="caseImageRemove" onclick="removeCaseImage()">✕</button>
-                            </div>
-                        </div>
-                        <input type="hidden" id="caseImage">
+                        <label>案例封面图URL</label>
+                        <input type="text" id="caseImage" placeholder="输入图片URL" oninput="previewImageFromUrl(this, 'caseImagePreview')" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <img id="caseImagePreview" class="preview-img" style="display: none; margin-top: 12px; border: 1px solid #eee; max-width: 150px;">
                     </div>
                 </div>
                 <div class="form-group">
@@ -1321,20 +1278,9 @@
                         <input type="number" id="configProductPrice" placeholder="3149.10">
                     </div>
                     <div class="form-group">
-                        <label>产品图片</label>
-                        <div class="image-upload-wrapper" style="gap: 8px;">
-                            <div class="upload-area" style="flex: 1; padding: 12px; font-size: 12px;" onclick="document.getElementById('configProductImageUpload').click()">
-                                <div class="icon" style="font-size: 20px;">📤</div>
-                                <p style="font-size: 12px;">点击上传</p>
-                                <input type="file" id="configProductImageUpload" accept="image/*" style="display: none" onchange="uploadConfigProductImage(event)">
-                            </div>
-                            <div class="image-preview-wrapper" id="configProductImagePreviewWrapper" style="width: 60px; height: 60px;">
-                                <span class="placeholder" style="font-size: 10px;">预览</span>
-                                <img id="configProductImagePreview" style="display: none;">
-                                <button class="remove-image" style="display: none;" id="configProductImageRemove" onclick="removeConfigProductImage()">✕</button>
-                            </div>
-                        </div>
-                        <input type="hidden" id="configProductImage">
+                        <label>产品图片URL</label>
+                        <input type="text" id="configProductImage" placeholder="输入图片URL" oninput="previewImageFromUrl(this, 'configProductImagePreview')" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <img id="configProductImagePreview" class="preview-img" style="display: none; margin-top: 12px; border: 1px solid #eee; max-width: 150px;">
                     </div>
                 </div>
                 <div class="form-group">
@@ -1367,20 +1313,9 @@
                     <input type="text" id="configGroupName" placeholder="外观颜色 / 雨棚宽度">
                 </div>
                 <div class="form-group">
-                    <label>分组图片</label>
-                    <div class="image-upload-wrapper" style="gap: 8px;">
-                        <div class="upload-area" style="flex: 1; padding: 12px; font-size: 12px;" onclick="document.getElementById('configGroupImageUpload').click()">
-                            <div class="icon" style="font-size: 20px;">📤</div>
-                            <p style="font-size: 12px;">点击上传分组图片</p>
-                            <input type="file" id="configGroupImageUpload" accept="image/*" style="display: none" onchange="uploadConfigGroupImage(event)">
-                        </div>
-                        <div class="image-preview-wrapper" id="configGroupImagePreviewWrapper" style="width: 60px; height: 60px;">
-                            <span class="placeholder" style="font-size: 10px;">预览</span>
-                            <img id="configGroupImagePreview" style="display: none;">
-                            <button class="remove-image" style="display: none;" id="configGroupImageRemove" onclick="removeConfigGroupImage()">✕</button>
-                        </div>
-                    </div>
-                    <input type="hidden" id="configGroupImage">
+                    <label>分组图片URL</label>
+                    <input type="text" id="configGroupImage" placeholder="输入图片URL（可选）" oninput="previewImageFromUrl(this, 'configGroupImagePreview')" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <img id="configGroupImagePreview" class="preview-img" style="display: none; margin-top: 12px; border: 1px solid #eee; max-width: 100px;">
                 </div>
                 <div class="form-group">
                     <label>分组类型</label>
@@ -1414,20 +1349,9 @@
                 <input type="hidden" id="configItemProductId">
                 <input type="hidden" id="configItemGroupId">
                 <div class="form-group">
-                    <label>配置项图片</label>
-                    <div class="image-upload-wrapper" style="gap: 8px;">
-                        <div class="upload-area" style="flex: 1; padding: 12px; font-size: 12px;" onclick="document.getElementById('configItemImageUpload').click()">
-                            <div class="icon" style="font-size: 20px;">📤</div>
-                            <p style="font-size: 12px;">点击上传配置项图片</p>
-                            <input type="file" id="configItemImageUpload" accept="image/*" style="display: none" onchange="uploadConfigItemImage(event)">
-                        </div>
-                        <div class="image-preview-wrapper" id="configItemImagePreviewWrapper" style="width: 60px; height: 60px;">
-                            <span class="placeholder" style="font-size: 10px;">预览</span>
-                            <img id="configItemImagePreview" style="display: none;">
-                            <button class="remove-image" style="display: none;" id="configItemImageRemove" onclick="removeConfigItemImage()">✕</button>
-                        </div>
-                    </div>
-                    <input type="hidden" id="configItemImage">
+                    <label>配置项图片URL</label>
+                    <input type="text" id="configItemImage" placeholder="输入图片URL（可选）" oninput="previewImageFromUrl(this, 'configItemImagePreview')" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <img id="configItemImagePreview" class="preview-img" style="display: none; margin-top: 12px; border: 1px solid #eee; max-width: 100px;">
                 </div>
                 <div class="form-group">
                     <label>配置项名称</label>
@@ -1830,44 +1754,64 @@
         }
 
         function insertImageToEditor(editorId) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        img.style.maxWidth = '100%';
-                        img.draggable = true;
-                        
-                        const editor = document.querySelector('#' + editorId + ' .rich-editor-content');
-                        editor.focus();
-                        
-                        // 在光标位置插入图片
-                        const selection = window.getSelection();
-                        if (selection.rangeCount > 0) {
-                            const range = selection.getRangeAt(0);
-                            range.deleteContents();
-                            range.insertNode(img);
-                            // 移动光标到图片后面
-                            range.setStartAfter(img);
-                            range.setEndAfter(img);
-                            selection.removeAllRanges();
-                            selection.addRange(range);
-                        } else {
-                            editor.appendChild(img);
-                        }
-                        
-                        // 给图片添加拖拽排序功能
-                        setupImageDrag(editor);
-                    };
-                    reader.readAsDataURL(file);
+            const imageUrl = prompt('请输入图片URL：', 'https://');
+            if (imageUrl && imageUrl.trim() && imageUrl !== 'https://') {
+                const img = document.createElement('img');
+                img.src = imageUrl.trim();
+                img.style.maxWidth = '100%';
+                img.draggable = true;
+                
+                const editor = document.querySelector('#' + editorId + ' .rich-editor-content');
+                editor.focus();
+                
+                // 在光标位置插入图片
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(img);
+                    // 移动光标到图片后面
+                    range.setStartAfter(img);
+                    range.setEndAfter(img);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } else {
+                    editor.appendChild(img);
                 }
-            };
-            input.click();
+                
+                // 给图片添加拖拽排序功能
+                setupImageDrag(editor);
+            }
+        }
+
+        // ========== URL图片预览通用函数 ==========
+        function previewImageFromUrl(inputEl, previewId) {
+            const url = inputEl.value.trim();
+            const preview = document.getElementById(previewId);
+            if (url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
+                preview.src = url;
+                preview.style.display = 'block';
+                preview.onerror = function() {
+                    preview.style.display = 'none';
+                };
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // 分类图标预览（支持emoji和URL）
+        function previewCategoryIcon(inputEl) {
+            const val = inputEl.value.trim();
+            const preview = document.getElementById('categoryIconPreview');
+            if (val && (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('/'))) {
+                preview.src = val;
+                preview.style.display = 'block';
+                preview.onerror = function() {
+                    preview.style.display = 'none';
+                };
+            } else {
+                preview.style.display = 'none';
+            }
         }
 
         function setupImageDrag(editor) {
@@ -1958,20 +1902,16 @@
         function setImagePreview(imageUrl, previewId, inputId, removeBtnId) {
             const input = document.getElementById(inputId);
             const preview = document.getElementById(previewId);
-            const removeBtn = document.getElementById(removeBtnId);
-            const placeholder = preview.parentElement.querySelector('.placeholder');
             
-            input.value = imageUrl || '';
-            if (imageUrl) {
-                preview.src = imageUrl;
-                preview.style.display = 'block';
-                removeBtn.style.display = 'flex';
-                placeholder && (placeholder.style.display = 'none');
-            } else {
-                preview.src = '';
-                preview.style.display = 'none';
-                removeBtn.style.display = 'none';
-                placeholder && (placeholder.style.display = 'block');
+            if (input) input.value = imageUrl || '';
+            if (preview) {
+                if (imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('/') || imageUrl.startsWith('data:'))) {
+                    preview.src = imageUrl;
+                    preview.style.display = 'block';
+                } else {
+                    preview.src = '';
+                    preview.style.display = 'none';
+                }
             }
         }
 
